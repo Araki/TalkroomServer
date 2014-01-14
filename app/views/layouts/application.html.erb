@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Talkroom</title>
+  <%= stylesheet_link_tag    "application", :media => "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+</head>
+<body>  
+  <div>  
+  <% if current_omniuser %>
+  	<%= image_tag current_omniuser.image %><br />
+  	<%= label_tag "メールアドレス： " + current_omniuser.email %><br />
+    <%= current_omniuser.name %>さん<br />
+    <%= link_to "ログアウト" ,logout_path %>  
+  <% else %>  
+    <!--<%= link_to "Twitterでlogin","/auth/twitter" %>-->
+    <%= link_to "facebookでlogin", "/auth/facebook" %>
+  <% end %>
+  </div>
+  <%= yield %>  
+<⁄body>
+</html>

@@ -1,6 +1,9 @@
 class VisitsController < ApplicationController
   # GET /visits
   # GET /visits.json
+  
+  before_filter :check_logined
+  
   def index
     @visits = Visit.all
 

@@ -7,5 +7,23 @@ class ApplicationController < ActionController::Base
   private  
   def current_omniuser  
     @current_omniuser ||= List.find(session[:user_id]) if session[:user_id]  
-  end  
+  end
+
+  #認証済みかどうかを判定するcheck_loginedフィルタを定義
+  def check_logined
+    if session[:user_id] then
+      begin
+        @usr = List.find(session[:user_id])
+      rescue ActiveRecord::RecordNotFound
+        reset_session
+      end
+    end
+    
+    unless @usr
+      logger.info('ログインできなかった')
+      flash[:referer] = request.fullpath
+      redirect_to :controller => 'welcome', :action => 'index'
+    end
+  end
+  
 end

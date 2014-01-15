@@ -1,6 +1,9 @@
 class RoomsController < ApplicationController
   # GET /rooms
   # GET /rooms.json
+  
+  before_filter :check_logined
+  
   def index
     @rooms = Room.all
 

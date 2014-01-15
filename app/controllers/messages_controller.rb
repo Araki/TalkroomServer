@@ -1,6 +1,9 @@
 class MessagesController < ApplicationController
   # GET /messages
   # GET /messages.json
+  
+  before_filter :check_logined
+  
   def index
     @messages = Message.all
 

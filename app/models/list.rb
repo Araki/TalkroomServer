@@ -1,7 +1,60 @@
 
 
 class List < ActiveRecord::Base
-  attr_accessible :name, :number
+  attr_accessible :channel, :fb_uid, :fb_name, :nickname, :email, :age, :purpose, :area, :profile_image1, :profile_image2, :profile_image3, :profile, :tall, :blood, :style, :holiday, :alcohol, :cigarette, :salary, :point
+  
+  validates :channel,
+    :presence => true
+    
+  # validates fb_uid,
+    
+  # validates :fb_name,
+    
+  validates :nickname,
+    :presence => true
+  
+  validates :email,
+    :presence => true,
+    :uniqueness => true,
+    :length => { :maximum => 50 },
+    :format => { :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
+    
+  validates :age,
+    :presence => true
+    
+  validates :purpose,
+    :presence => true
+    
+  validates :area,
+    :presence => true
+  
+  validates :profile_image1,
+    :presence => true
+    
+  # validates :profile_image2,
+    
+  # validates :profile_image3,
+    
+  validates :profile,
+    :length => { :maximum => 140 }
+    
+  # validates :tall,
+  
+  # validates :blood,
+  
+  # validates :style,
+  
+  # validates :holiday,
+  
+  # validates :alcohol,
+  
+  # validates :cigarette,
+  
+  # validates :salary,
+  
+  validates :point,
+    :presence => true,
+    :numericality => { :only_integer => true }
   
   def self.create_with_omniauth(auth)
     create! do |list|

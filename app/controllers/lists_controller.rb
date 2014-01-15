@@ -1,6 +1,9 @@
 class ListsController < ApplicationController
   # GET /lists
   # GET /lists.json
+  
+  before_filter :check_logined
+  
   def index
     @lists = List.all
 
@@ -78,6 +81,24 @@ class ListsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to lists_url }
       format.json { head :no_content }
+    end
+  end
+
+  private
+  #認証済みかどうかを判定するcheck_loginedフィルタを定義
+  def check_logined
+    if session[:user_id] then
+      begin
+        @usr = Omniuser.find(session[:user_id])
+      rescue ActiveRecord::RecordNotFound
+        reset_session
+      end
+    end
+    
+    unless @usr
+      # logger.info('ログインできなかった')
+      flash[:referer] = request.fullpath
+      redirect_to :controller => 'welcome', :action => 'index'
     end
   end
 end

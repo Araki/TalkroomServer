@@ -2,8 +2,12 @@
 
 <table>
   <tr>
-    <th>Name</th>
-    <th>Number</th>
+  	<th>ID</th>
+    <th>入会経路</th>
+    <th>UID</th>
+    <th>FB Name</th>
+    <th>メールアドレス</th>
+    <th>アイコンURL</th>
     <th></th>
     <th></th>
     <th></th>
@@ -11,8 +15,12 @@
 
 <% @lists.each do |list| %>
   <tr>
-    <td><%= list.name %></td>
-    <td><%= list.number %></td>
+  	<td><%= list.id %></td>
+    <td><%= list.channel %></td>
+    <td><%= list.fb_uid %></td>
+    <td><%= list.fb_name %></td>
+    <td><%= truncate(list.email, { :length => 20 }) %></td>
+    <td><%= truncate(list.profile_image1, { :length => 20 })  %></td>
     <td><%= link_to 'Show', list %></td>
     <td><%= link_to 'Edit', edit_list_path(list) %></td>
     <td><%= link_to 'Destroy', list, confirm: 'Are you sure?', method: :delete %></td>

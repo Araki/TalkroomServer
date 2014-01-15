@@ -11,13 +11,31 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140114113349) do
+ActiveRecord::Schema.define(:version => 20140115111942) do
 
   create_table "lists", :force => true do |t|
-    t.string   "name"
-    t.integer  "number"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+    t.string   "channel"
+    t.string   "fb_uid"
+    t.string   "fb_name"
+    t.string   "nickname"
+    t.string   "email"
+    t.integer  "age"
+    t.integer  "purpose"
+    t.integer  "area"
+    t.string   "profile_image1"
+    t.string   "profile_image2"
+    t.string   "profile_image3"
+    t.string   "profile"
+    t.integer  "tall"
+    t.integer  "blood"
+    t.integer  "style"
+    t.integer  "holiday"
+    t.integer  "alcohol"
+    t.integer  "cigarette"
+    t.integer  "salary"
+    t.integer  "point"
   end
 
   create_table "omniusers", :force => true do |t|

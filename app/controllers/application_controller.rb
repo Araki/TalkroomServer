@@ -6,6 +6,6 @@ class ApplicationController < ActionController::Base
   
   private  
   def current_omniuser  
-    @current_omniuser ||= Omniuser.find(session[:user_id]) if session[:user_id]  
+    @current_omniuser ||= List.find(session[:user_id]) if session[:user_id]  
   end  
 end

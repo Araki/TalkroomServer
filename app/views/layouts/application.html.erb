@@ -9,9 +9,9 @@
 <body>  
   <div>  
   <% if current_omniuser %>
-  	<%= image_tag current_omniuser.image %><br />
+  	<%= image_tag current_omniuser.profile_image1 %><br />
   	<%= label_tag "メールアドレス： " + current_omniuser.email %><br />
-    <%= current_omniuser.name %>さん<br />
+    <%= current_omniuser.fb_name %>さん<br />
     <%= link_to "ログアウト" ,logout_path %>  
   <% else %>  
     <!--<%= link_to "Twitterでlogin","/auth/twitter" %>-->

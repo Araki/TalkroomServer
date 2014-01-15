@@ -89,14 +89,14 @@ class ListsController < ApplicationController
   def check_logined
     if session[:user_id] then
       begin
-        @usr = Omniuser.find(session[:user_id])
+        @usr = List.find(session[:user_id])
       rescue ActiveRecord::RecordNotFound
         reset_session
       end
     end
     
     unless @usr
-      # logger.info('ログインできなかった')
+      logger.info('ログインできなかった')
       flash[:referer] = request.fullpath
       redirect_to :controller => 'welcome', :action => 'index'
     end

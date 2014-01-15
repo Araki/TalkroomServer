@@ -2,7 +2,7 @@
 
 class Omniuser < ActiveRecord::Base
   # attr_accessible :name, :provider, :uid
-  
+=begin
   def self.create_with_omniauth(auth)
     create! do |omniuser|
       omniuser.provider = auth["provider"]
@@ -17,4 +17,5 @@ class Omniuser < ActiveRecord::Base
       end
     end
   end
+=end
 end

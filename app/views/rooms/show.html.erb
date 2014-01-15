@@ -1,0 +1,15 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Public:</b>
+  <%= @room.public %>
+</p>
+
+<p>
+  <b>Message number:</b>
+  <%= @room.message_number %>
+</p>
+
+
+<%= link_to 'Edit', edit_room_path(@room) %> |
+<%= link_to 'Back', rooms_path %>

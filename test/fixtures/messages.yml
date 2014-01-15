@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  send_from: 1
+  send_to: 1
+  room: 1
+  body: MyString
+
+two:
+  send_from: 1
+  send_to: 1
+  room: 1
+  body: MyString

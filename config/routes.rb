@@ -1,4 +1,10 @@
 Talkroom::Application.routes.draw do
+  resources :visits
+
+  resources :rooms
+
+  resources :messages
+
   get "sessions/callback"
   get "welcome/index"
   resources :lists

@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  visitor: 1
+  visit_at: 1
+
+two:
+  visitor: 1
+  visit_at: 1

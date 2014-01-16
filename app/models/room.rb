@@ -1,8 +1,7 @@
 class Room < ActiveRecord::Base
   attr_accessible :message_number, :public
   
-  validates :public,
-    :presence => true
+  # validates :public,
     
   validates :message_number,
     :presence => true

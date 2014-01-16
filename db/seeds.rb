@@ -46,14 +46,14 @@ end
 
 =end
 
-
+=begin
 
 CSV.foreach('db/room.csv') do |row|
   Room.create(:public => row[1],
               :message_number => row[0])
 end
 
-
+=end
 
 =begin
 

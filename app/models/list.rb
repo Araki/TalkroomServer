@@ -3,6 +3,16 @@
 class List < ActiveRecord::Base
   attr_accessible :channel, :fb_uid, :fb_name, :nickname, :email, :age, :purpose, :area, :profile_image1, :profile_image2, :profile_image3, :profile, :tall, :blood, :style, :holiday, :alcohol, :cigarette, :salary, :point
   
+  #==========
+  #アソシエーションの設定
+  #==========
+  has_many :messages
+  has_many :visits
+  
+  
+  #==========
+  #バリデーションの設定
+  #==========
   validates :channel,
     :presence => true
     
@@ -55,6 +65,10 @@ class List < ActiveRecord::Base
   validates :point,
     :presence => true,
     :numericality => { :only_integer => true }
+  
+  #==========
+  #LISTテーブルへのユーザー情報登録
+  #==========
   
   def self.create_with_omniauth(auth)
     create! do |list|

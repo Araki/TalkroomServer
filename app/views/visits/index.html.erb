@@ -11,8 +11,8 @@
 
 <% @visits.each do |visit| %>
   <tr>
-    <td><%= visit.visitor %></td>
-    <td><%= visit.visit_at %></td>
+    <td><%= visit.visitor.nickname %></td>
+    <td><%= visit.visitat.nickname %></td>
     <td><%= link_to 'Show', visit %></td>
     <td><%= link_to 'Edit', edit_visit_path(visit) %></td>
     <td><%= link_to 'Destroy', visit, method: :delete, data: { confirm: 'Are you sure?' } %></td>

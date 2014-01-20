@@ -1,4 +1,7 @@
 Talkroom::Application.routes.draw do
+  resources :lists
+  match "/get_recent_messages" => "api#get_recent_rooms"
+  
   resources :visits
 
   resources :rooms
@@ -7,8 +10,6 @@ Talkroom::Application.routes.draw do
 
   get "sessions/callback"
   get "welcome/index"
-  resources :lists
-  
   match "/auth/:provider/callback" => "sessions#callback"  
   match "/logout" => "sessions#destroy", :as => :logout  
   root :to => 'welcome#index'  

@@ -1,5 +1,5 @@
 class Message < ActiveRecord::Base
-  attr_accessible :body, :room, :send_from, :send_to
+  attr_accessible :body, :room_id, :sendfrom_list_id, :sendto_list_id
   
   #==========
   #アソシエーションの設定
@@ -7,18 +7,18 @@ class Message < ActiveRecord::Base
   #belongs_to (オブジェクト名, :class_name => 参照先クラス名, :foreign_key => 接続フィールド名)
   belongs_to :sendfrom, :class_name => 'List', :foreign_key => 'sendfrom_list_id'
   belongs_to :sendto, :class_name => 'List', :foreign_key => 'sendto_list_id'
-  belongs_to :rooms
+  belongs_to :room
   
   #==========
   #バリデーションの設定
   #==========
-  validates :send_from,
+  validates :sendfrom_list_id,
     :presence => true
     
-  validates :send_to,
+  validates :sendto_list_id,
     :presence => true
   
-  validates :room,
+  validates :room_id,
     :presence => true
     
   validates :body,

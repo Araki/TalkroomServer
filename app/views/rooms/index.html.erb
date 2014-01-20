@@ -2,6 +2,7 @@
 
 <table>
   <tr>
+  	<th>ID</th>
     <th>Public</th>
     <th>Message number</th>
     <th></th>
@@ -11,6 +12,7 @@
 
 <% @rooms.each do |room| %>
   <tr>
+  	<td><%= room.id %></td>
     <td><%= room.public %></td>
     <td><%= room.message_number %></td>
     <td><%= link_to 'Show', room %></td>

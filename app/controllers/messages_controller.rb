@@ -3,7 +3,7 @@ class MessagesController < ApplicationController
   # GET /messages.json
   
   before_filter :check_logined
-  
+    
   def index
     @messages = Message.all
 

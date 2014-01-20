@@ -2,6 +2,7 @@
 
 <table>
   <tr>
+  	<th>ID</th>
     <th>Send from</th>
     <th>Send to</th>
     <th>Room</th>
@@ -13,6 +14,7 @@
 
 <% @messages.each do |message| %>
   <tr>
+  	<td><%= message.id %></td>
     <td><%= message.sendfrom.nickname %></td>
     <td><%= message.sendto.nickname %></td>
     <td><%= message.room_id %></td>

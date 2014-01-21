@@ -42,21 +42,17 @@ class ApiController < ApplicationController
     end
   end
   
+  
+  
+  
   #「年代」「エリア」「目的」から検索し、結果を返すAPI
   #受け取るクエリ
   #年代：age
   #エリア：area
   #目的：purpose
   def get_search_users
-    age = params[:age]
-    area = params[:area]
-    purpose = params[:purpose]
     
-    logger.info(age)
-    logger.info(area)
-    logger.info(purpose)
-    
-    sql = 'SELECT L.id, L.nickname, L.age, L.profile_image1, L.profile, L.area, L.purpose, L.last_logined FROM lists AS L, messages AS M WHERE L.id = M.sendfrom_list_id '
+    sql = 'SELECT L.id, L.nickname, L.age, L.profile_image1, L.profile, L.area, L.purpose, L.last_logined, M.room_id FROM lists AS L, messages AS M WHERE L.id = M.sendfrom_list_id '
     if params[:age] == "" && params[:area] == "" && params[:purpose] == "" then
     else
       if params[:age] != "" then
@@ -70,12 +66,62 @@ class ApiController < ApplicationController
       end
     end
     
-    sql = sql +'ORDER BY M.id DESC LIMIT 20;'
+    sql = sql + 'ORDER BY M.id DESC LIMIT 20;'
     
     results = ActiveRecord::Base.connection.execute(sql)
     
     respond_to do |format|
       format.json { render json: results }
     end
+  end
+  
+  
+  
+  
+  #トーク画面のアタック中のリスト結果を返すAPI
+  #受け取るクエリ
+  #ユーザーID：user_id
+  def get_oneside_rooms
+    #（１）USERがメッセージを送った相手全員のIDを取得
+    sql1 = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE R.id = M.room_id AND M.sendfrom_list_id = ' + params[:user_id] + ' GROUP BY M.sendto_list_id ORDER BY R.updated_at DESC;'
+    results = ActiveRecord::Base.connection.execute(sql1)
+    #（２）双方向でメッセージを送りあった相手全員のIDを取得
+    sql2 = 'SELECT DISTINCT sendfrom_list_id FROM messages WHERE sendfrom_list_id = ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + params[:user_id] + ') GROUP BY sendfrom_list_id;'
+    mutual_send_users = ActiveRecord::Base.connection.execute(sql2)
+    
+    val =[]
+    
+    logger.info("初期値＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
+    logger.info(results)
+    
+    #（１）から（２）の配列を取り除く
+    mutual_send_users.each do |user|
+      results.each do |result|
+        if result["sendto_list_id"] == user["sendfrom_list_id"] then
+          results.delete(result)
+          logger.info("削除＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
+          logger.info(results)
+        end
+      end
+    end
+    
+    #ハッシュ配列を整形
+    results.each do |result|
+      nickname, profile_image, profile = nil
+      obj = List.select("nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
+      val.push({
+        :nickname => obj["nickname"], 
+        :profile_image => obj["profile_image1"], 
+        :profile => obj["profile"], 
+        :room_updated => result["updated_at"], 
+        :room_public => result["public"], 
+        :room_id => result["room_id"]
+      })
+    end
+    
+    respond_to do |format|
+      format.json { render json: val }
+    end
+    
   end
 end

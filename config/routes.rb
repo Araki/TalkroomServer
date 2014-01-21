@@ -2,6 +2,7 @@ Talkroom::Application.routes.draw do
   resources :lists
   match "/get_recent_messages" => "api#get_recent_rooms"
   match "/get_search_users" => "api#get_search_users"
+  match "/get_oneside_rooms" => "api#get_oneside_rooms"
   
   resources :visits
 

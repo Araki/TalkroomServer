@@ -15,8 +15,8 @@
 <% @messages.each do |message| %>
   <tr>
   	<td><%= message.id %></td>
-    <td><%= message.sendfrom.nickname %></td>
-    <td><%= message.sendto.nickname %></td>
+    <td><%= message.sendfrom_list_id %></td>
+    <td><%= message.sendto_list_id %></td>
     <td><%= message.room_id %></td>
     <td><%= truncate(message.body, { :length => 30 }) %></td>
     <td><%= link_to 'Show', message %></td>

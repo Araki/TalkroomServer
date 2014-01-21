@@ -32,15 +32,14 @@ CSV.foreach('db/list.csv') do |row|
               :salary => row[18],
               :point => row[19])
 end
-
 =end
 
 =begin
 
 CSV.foreach('db/message.csv') do |row|
-  Message.create(:send_from => row[0],
-                 :send_to => row[1],
-                 :room => row[2],
+  Message.create(:sendfrom_list_id => row[0],
+                 :sendto_list_id => row[1],
+                 :room_id => row[2],
                  :body => row[3])
 end
 

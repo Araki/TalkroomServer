@@ -18,8 +18,8 @@ class List < ActiveRecord::Base
     
   # validates :fb_name,
     
-  validates :nickname,
-    :presence => true
+  #validates :nickname,
+  #  :presence => true
   
   validates :email,
     :presence => true,
@@ -27,14 +27,14 @@ class List < ActiveRecord::Base
     :length => { :maximum => 50 },
     :format => { :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
     
-  validates :age,
-    :presence => true
+  #validates :age,
+  #  :presence => true
     
-  validates :purpose,
-    :presence => true
+  #validates :purpose,
+  #  :presence => true
     
-  validates :area,
-    :presence => true
+  #validates :area,
+  #  :presence => true
   
   validates :profile_image1,
     :presence => true
@@ -60,9 +60,9 @@ class List < ActiveRecord::Base
   
   # validates :salary,
   
-  validates :point,
-    :presence => true,
-    :numericality => { :only_integer => true }
+  #validates :point,
+  #  :presence => true,
+  #  :numericality => { :only_integer => true }
   
   #==========
   #LISTテーブルへのユーザー情報登録

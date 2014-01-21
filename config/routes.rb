@@ -1,6 +1,7 @@
 Talkroom::Application.routes.draw do
   resources :lists
   match "/get_recent_messages" => "api#get_recent_rooms"
+  match "/get_search_users" => "api#get_search_users"
   
   resources :visits
 

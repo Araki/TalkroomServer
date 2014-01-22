@@ -4,13 +4,11 @@ class ApiController < ApplicationController
   
   #のぞくボタンのトップ画面
   def get_recent_rooms
-    
     #<抽出条件>
     #(1)rooms.publicがTRUEである
     #(2)messages.room_id = rooms.idであること
     #(3)updated_atでDESCにソート
     #(4)rooms.idもしくはmessages.room_idが重複しないもの
-    
     sql = 'SELECT MIN(R.id), R.public, R.updated_at, M.room_id, M.sendfrom_list_id, M.sendto_list_id, M.body FROM rooms AS R, messages AS M WHERE R.public = "t" AND M.room_id = R.id GROUP BY M.room_id ORDER BY R.updated_at DESC LIMIT 10;'
     @results = ActiveRecord::Base.connection.execute(sql)
     
@@ -91,16 +89,11 @@ class ApiController < ApplicationController
     
     val =[]
     
-    logger.info("初期値＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
-    logger.info(results)
-    
     #（１）から（２）の配列を取り除く
     mutual_send_users.each do |user|
       results.each do |result|
         if result["sendto_list_id"] == user["sendfrom_list_id"] then
           results.delete(result)
-          logger.info("削除＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝")
-          logger.info(results)
         end
       end
     end
@@ -124,4 +117,35 @@ class ApiController < ApplicationController
     end
     
   end
+  
+  #トーク画面のトーク中のリスト結果を返すAPI
+  #受け取るクエリ
+  #ユーザーID：user_id
+  def get_bothside_rooms
+    #双方向でメッセージを送りあった相手全員のIDを取得
+    sql = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE M.sendfrom_list_id = ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + params[:user_id] + ') GROUP BY M.sendfrom_list_id ORDER BY R.updated_at DESC;'
+    results = ActiveRecord::Base.connection.execute(sql)
+    
+    val =[]
+    
+    #ハッシュ配列を整形
+    results.each do |result|
+      nickname, profile_image, profile = nil
+      obj = List.select("nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
+      val.push({
+        :nickname => obj["nickname"], 
+        :profile_image => obj["profile_image1"], 
+        :profile => obj["profile"], 
+        :room_updated => result["updated_at"], 
+        :room_public => result["public"], 
+        :room_id => result["room_id"]
+      })
+    end
+    
+    respond_to do |format|
+      format.json { render json: val }
+    end
+    
+  end
+  
 end

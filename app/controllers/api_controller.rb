@@ -10,26 +10,30 @@ class ApiController < ApplicationController
     #(3)updated_atでDESCにソート
     #(4)rooms.idもしくはmessages.room_idが重複しないもの
     sql = 'SELECT MIN(R.id), R.public, R.updated_at, M.room_id, M.sendfrom_list_id, M.sendto_list_id, M.body FROM rooms AS R, messages AS M WHERE R.public = "t" AND M.room_id = R.id GROUP BY M.room_id ORDER BY R.updated_at DESC LIMIT 10;'
-    @results = ActiveRecord::Base.connection.execute(sql)
+    results = ActiveRecord::Base.connection.execute(sql)
     
-    val =[]
-
-    @results.each do |result|
-      roomid, updatedtime, sendfrom_image, sendfrom_message, sendto_image, sendto_message = nil
-      roomid = result["room_id"]
-      updatedtime = result["updated_at"]
+    val = []
+    
+    results.each do |result|
+      sendfrom_image, sendto_image, sendto_message = nil
       obj1 = List.select(:profile_image1).where('id = ?', result["sendfrom_list_id"]).first
       sendfrom_image = obj1["profile_image1"]
-      sendfrom_message = result["body"]
       obj2 = List.select(:profile_image1).where('id = ?', result["sendto_list_id"]).first
       sendto_image = obj2["profile_image1"]
       obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_list_id"]).order('id DESC').first
-      sendto_message = obj3["body"]
+      
+      #もし相手がメッセージ未返信だった場合を想定
+      if obj3 then
+        sendto_message = obj3["body"]
+      else
+        sendto_message = ""
+      end
+      
       val.push({
-        :room_id => roomid, 
-        :updated_at => updatedtime, 
+        :room_id => result["room_id"], 
+        :updated_at => result["updated_at"], 
         :sendfrom_image => sendfrom_image, 
-        :sendfrom_message => sendfrom_message, 
+        :sendfrom_message => result["body"], 
         :sendto_image => sendto_image, 
         :sendto_message => sendto_message
       })
@@ -38,6 +42,7 @@ class ApiController < ApplicationController
     respond_to do |format|
       format.json { render json: val }
     end
+    
   end
   
   
@@ -126,7 +131,7 @@ class ApiController < ApplicationController
     sql = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE M.sendfrom_list_id = ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + params[:user_id] + ') GROUP BY M.sendfrom_list_id ORDER BY R.updated_at DESC;'
     results = ActiveRecord::Base.connection.execute(sql)
     
-    val =[]
+    val = []
     
     #ハッシュ配列を整形
     results.each do |result|
@@ -148,6 +153,8 @@ class ApiController < ApplicationController
     
   end
   
+  
+  
   #あるユーザーの詳細画面
   #受け取るクエリ
   #ユーザーID：user_id
@@ -157,6 +164,48 @@ class ApiController < ApplicationController
     respond_to do |format|
       format.json { render json: result }
     end
+  end
+  
+  
+  #あるユーザーのルームリストを返す
+  #受け取るクエリ
+  #ユーザーID：user_id
+  def get_user_rooms
+    sql = 'SELECT MIN(R.id), R.public, R.updated_at, M.room_id, M.sendfrom_list_id, M.sendto_list_id, M.body FROM rooms AS R, messages AS M WHERE R.public = "t" AND M.room_id = R.id AND ( M.sendfrom_list_id = ' + params[:user_id] + ' OR M.sendto_list_id = ' + params[:user_id] + ' ) GROUP BY M.room_id ORDER BY R.updated_at DESC LIMIT 10;'
+    results = ActiveRecord::Base.connection.execute(sql)
+    
+    val = []
+    
+    #ハッシュ配列を整形
+    results.each do |result|
+      sendfrom_image, sendto_image, sendto_message = nil
+      obj1 = List.select(:profile_image1).where('id = ?', result["sendfrom_list_id"]).first
+      sendfrom_image = obj1["profile_image1"]
+      obj2 = List.select(:profile_image1).where('id = ?', result["sendto_list_id"]).first
+      sendto_image = obj2["profile_image1"]
+      obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_list_id"]).order('id DESC').first
+      
+      #もし相手がメッセージ未返信だった場合を想定
+      if obj3 then
+        sendto_message = obj3["body"]
+      else
+        sendto_message = ""
+      end
+      
+      val.push({
+        :room_id => result["room_id"], 
+        :updated_at => result["updated_at"], 
+        :sendfrom_image => sendfrom_image, 
+        :sendfrom_message => result["body"], 
+        :sendto_image => sendto_image, 
+        :sendto_message => sendto_message
+      })
+    end
+    
+    respond_to do |format|
+      format.json { render json: val }
+    end
+    
   end
   
 end

@@ -148,4 +148,15 @@ class ApiController < ApplicationController
     
   end
   
+  #あるユーザーの詳細画面
+  #受け取るクエリ
+  #ユーザーID：user_id
+  def get_detail_profile
+    result = List.find(params[:user_id])
+    
+    respond_to do |format|
+      format.json { render json: result }
+    end
+  end
+  
 end

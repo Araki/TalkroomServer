@@ -1,6 +1,6 @@
 class ApiController < ApplicationController
   
-  before_filter :check_logined
+  #before_filter :check_logined
   
   #のぞくボタンのトップ画面
   def get_recent_rooms

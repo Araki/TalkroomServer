@@ -55,28 +55,93 @@ class ApiController < ApplicationController
   #目的：purpose
   def get_search_users
     
-    sql = 'SELECT L.id, L.nickname, L.age, L.profile_image1, L.profile, L.area, L.purpose, L.last_logined, M.room_id FROM lists AS L, messages AS M WHERE L.id = M.sendfrom_list_id '
+    sql = 'SELECT id, nickname, age, profile_image1, profile, area, purpose, last_logined FROM lists WHERE '
     if params[:age] == "" && params[:area] == "" && params[:purpose] == "" then
     else
       if params[:age] != "" then
-        sql = sql + 'AND L.age = ' + params[:age] + ' '
+        sql = sql + 'age = ' + params[:age] + ' '
       end
       if params[:area] != "" then
-        sql = sql + 'AND L.area = ' + params[:area] + ' '
+        if params[:age] != "" then
+          sql = sql + 'AND '
+        end
+        sql = sql + 'area = ' + params[:area] + ' '
       end
       if params[:purpose] != "" then
-        sql = sql + 'AND L.purpose = ' + params[:purpose] + ' '
+        if params[:age] != "" || params[:area] != "" then
+          sql = sql + 'AND '
+        end
+        sql = sql + 'purpose = ' + params[:purpose] + ' '
       end
     end
     
-    sql = sql + 'ORDER BY M.id DESC LIMIT 20;'
+    sql = sql + 'ORDER BY last_logined DESC LIMIT 20;'
     
     results = ActiveRecord::Base.connection.execute(sql)
     
+    val = []
+    
+    #現在時刻の取得
+    now = Time.now.utc
+    logger.info(now)
+    
+    results.each do |result|
+      
+      lastlogined = result["last_logined"].to_time
+      
+      seconds = now - lastlogined
+      minutes = seconds / 60
+      
+      if minutes < 1 then
+        logintime = "1分以内"
+      elsif minutes < 60 then
+        logintime = minutes.round.to_s + "分前"
+        logger.info(logintime)
+      else
+        hours = minutes / 60
+        
+        if hours < 24 then
+          logintime = hours.round.to_s + "時間前"
+          logger.info(logintime)
+        else
+          days = hours / 24
+          
+          if days < 7 then
+            logintime = days.round.to_s + "日前"
+            logger.info(logintime)
+          else
+            weeks = days / 7
+            
+            if weeks < 4 then
+              logintime = weeks.round.to_s + "週間前"
+              logger.info(logintime)
+            else
+              logintime = "1ヶ月以上前"
+              logger.info(logintime)
+            end
+          end
+        end
+      end      
+
+      val.push({
+        :id => result["id"], 
+        :nickname => result["nickname"], 
+        :age => result["age"],
+        :profile_image1 => result["profile_image1"],
+        :profile => result["profile"],
+        :area => result["area"],
+        :purpose => result["purpose"],
+        :last_logined => logintime,
+        :room_id => result["room_id"]
+      })
+
+    end
+    
     respond_to do |format|
-      format.json { render json: results }
+      format.json { render json: val }
     end
   end
+  
   
   
   

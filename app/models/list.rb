@@ -1,5 +1,5 @@
 class List < ActiveRecord::Base
-  attr_accessible :channel, :fb_uid, :fb_name, :nickname, :email, :age, :purpose, :area, :profile_image1, :profile_image2, :profile_image3, :profile, :tall, :blood, :style, :holiday, :alcohol, :cigarette, :salary, :point
+  attr_accessible :channel, :fb_uid, :fb_name, :nickname, :email, :age, :purpose, :area, :profile_image1, :profile_image2, :profile_image3, :profile, :tall, :blood, :style, :holiday, :alcohol, :cigarette, :salary, :point, :last_logined
   
   #==========
   #アソシエーションの設定

@@ -21,6 +21,7 @@ class ApiController < ApplicationController
       obj2 = List.select(:profile_image1).where('id = ?', result["sendto_list_id"]).first
       sendto_image = obj2["profile_image1"]
       obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_list_id"]).order('id DESC').first
+      updatedtime = exchangeTime(result["updated_at"].to_time)
       
       #もし相手がメッセージ未返信だった場合を想定
       if obj3 then
@@ -31,7 +32,7 @@ class ApiController < ApplicationController
       
       val.push({
         :room_id => result["room_id"], 
-        :updated_at => result["updated_at"], 
+        :updated_at => updatedtime, #result["updated_at"], 
         :sendfrom_image => sendfrom_image, 
         :sendfrom_message => result["body"], 
         :sendto_image => sendto_image, 
@@ -55,9 +56,10 @@ class ApiController < ApplicationController
   #目的：purpose
   def get_search_users
     
-    sql = 'SELECT id, nickname, age, profile_image1, profile, area, purpose, last_logined FROM lists WHERE '
+    sql = 'SELECT id, nickname, age, profile_image1, profile, area, purpose, last_logined FROM lists '
     if params[:age] == "" && params[:area] == "" && params[:purpose] == "" then
     else
+      sql = sql + "WHERE "
       if params[:age] != "" then
         sql = sql + 'age = ' + params[:age] + ' '
       end
@@ -81,6 +83,9 @@ class ApiController < ApplicationController
     
     val = []
     
+    results.each do |result|
+      logintime = exchangeTime(result["last_logined"].to_time)
+=begin    
     #現在時刻の取得
     now = Time.now.utc
     logger.info(now)
@@ -121,7 +126,8 @@ class ApiController < ApplicationController
             end
           end
         end
-      end      
+      end 
+=end     
 
       val.push({
         :id => result["id"], 
@@ -249,6 +255,7 @@ class ApiController < ApplicationController
       obj2 = List.select(:profile_image1).where('id = ?', result["sendto_list_id"]).first
       sendto_image = obj2["profile_image1"]
       obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_list_id"]).order('id DESC').first
+      updatedtime = exchangeTime(result["updated_at"].to_time)
       
       #もし相手がメッセージ未返信だった場合を想定
       if obj3 then
@@ -259,7 +266,7 @@ class ApiController < ApplicationController
       
       val.push({
         :room_id => result["room_id"], 
-        :updated_at => result["updated_at"], 
+        :updated_at => updatedtime, #result["updated_at"], 
         :sendfrom_image => sendfrom_image, 
         :sendfrom_message => result["body"], 
         :sendto_image => sendto_image, 
@@ -271,6 +278,50 @@ class ApiController < ApplicationController
       format.json { render json: val }
     end
     
+  end
+  
+  #時間を「〜分前」に変換するメソッド
+  def exchangeTime(time)
+    #現在時刻の取得
+    now = Time.now.utc
+    logger.info(now)
+      
+    lastlogined = time
+      
+    seconds = now - lastlogined
+    minutes = seconds / 60
+      
+    if minutes < 1 then
+      timetext = "1分以内"
+    elsif minutes < 60 then
+      timetext = minutes.round.to_s + "分前"
+      logger.info(timetex)
+    else
+      hours = minutes / 60
+        
+      if hours < 24 then
+        timetext = hours.round.to_s + "時間前"
+        logger.info(timetext)
+      else
+        days = hours / 24
+          
+        if days < 7 then
+          timetext = days.round.to_s + "日前"
+          logger.info(timetext)
+        else
+          weeks = days / 7
+            
+          if weeks < 4 then
+            timetext = weeks.round.to_s + "週間前"
+            logger.info(timetext)
+          else
+            timetext = "1ヶ月以上前"
+            logger.info(timetext)
+          end
+        end
+      end
+    end
+  return timetext
   end
   
 end

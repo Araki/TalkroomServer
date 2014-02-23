@@ -1,7 +1,7 @@
 # coding: utf-8
 
 class ApplicationController < ActionController::Base  
-  protect_from_forgery  
+  #protect_from_forgery
   helper_method :current_omniuser  
   
   private  

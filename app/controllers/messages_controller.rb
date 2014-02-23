@@ -2,7 +2,8 @@ class MessagesController < ApplicationController
   # GET /messages
   # GET /messages.json
   
-  before_filter :check_logined
+  #サービス開始時にはコメントアウトを外す
+  #before_filter :check_logined
     
   def index
     @messages = Message.all
@@ -43,7 +44,23 @@ class MessagesController < ApplicationController
   # POST /messages
   # POST /messages.json
   def create
-    @message = Message.new(params[:message])
+    #作成中　POST送信
+    query = params[:message]
+    receive_data = JSON.parse(query)
+    
+    logger.info(receive_data['sendfrom_list_id'])
+    logger.info(receive_data['sendto_list_id'])
+    logger.info(receive_data['room_id'])
+    logger.info(receive_data['body'])
+    
+    @message = Message.new
+    @message.sendfrom_list_id = receive_data['sendfrom_list_id']
+    @message.sendto_list_id = receive_data['sendto_list_id']
+    @message.room_id = receive_data['room_id']
+    @message.body = receive_data['body']
+    #作成中終わり
+    
+    #@message = Message.new(params[:message])
 
     respond_to do |format|
       if @message.save

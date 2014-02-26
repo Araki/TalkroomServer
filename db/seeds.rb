@@ -8,7 +8,7 @@
 
 require "csv"
 
-=begin
+
  
 CSV.foreach('db/list.csv') do |row|
   List.create(:channel => row[0],
@@ -32,9 +32,6 @@ CSV.foreach('db/list.csv') do |row|
               :salary => row[18],
               :point => row[19])
 end
-=end
-
-=begin
 
 CSV.foreach('db/message.csv') do |row|
   Message.create(:sendfrom_list_id => row[0],
@@ -43,22 +40,14 @@ CSV.foreach('db/message.csv') do |row|
                  :body => row[3])
 end
 
-=end
-
-=begin
 
 CSV.foreach('db/room.csv') do |row|
   Room.create(:public => row[1],
               :message_number => row[0])
 end
 
-=end
-
-=begin
 
 CSV.foreach('db/visit.csv') do |row|
   Visit.create(:visitor => row[0],
                :visit_at => row[1],)
 end
-
-=end

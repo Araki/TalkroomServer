@@ -1,8 +1,8 @@
 class ListsController < ApplicationController
   # GET /lists
   # GET /lists.json
-  
-  before_filter :check_logined
+  #サービス開始時にはコメントアウトを外す
+  #before_filter :check_logined
   
   def index
     @lists = List.all

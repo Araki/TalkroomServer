@@ -9,10 +9,10 @@ class ApiController < ApplicationController
     #(2)messages.room_id = rooms.idであること
     #(3)updated_atでDESCにソート
     #(4)rooms.idもしくはmessages.room_idが重複しないもの
-    require 'rubygems'
-    require 'arel'
-    require 'sqlite3'
-    require 'active_record'
+    #require 'rubygems'
+    #require 'arel'
+    #require 'sqlite3'
+    #require 'active_record'
     
     Arel::Table.engine = Arel::Sql::Engine.new(ActiveRecord::Base)
     

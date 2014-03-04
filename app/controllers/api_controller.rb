@@ -22,17 +22,15 @@ class ApiController < ApplicationController
     rooms = Arel::Table.new(:rooms, :as => 'rooms')#Arel::Table.new(:rooms)
     messages = Arel::Table.new(:messages, :as => 'messages')#Arel::Table.new(:messages)
     
-    predicate = messages[:room_id].eq(rooms[:id])
-    #Arel.sql('*')
-    query = messages.join(rooms).on(predicate)
-                    .project(rooms[:id].minimum)
-                    .group(messages[:room_id])
-                    .take(10)
-=begin
-    query = messages.join(rooms).on(predicate)
-                    .join(sendfrom_lists).on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id]))
-                    .join(sendto_lists).on(messages[:sendto_list_id].eq(sendto_lists[:id]))
-                    .project(rooms[:id].minimum, 
+    recent_unique_messages = messages.project(messages[:id].maximum)
+                              .group(messages[:room_id])
+                              .order(messages[:id].desc)
+   
+                  
+    query = rooms.join(messages).on(messages[:room_id].eq(rooms[:id]))
+                 .join(sendfrom_lists).on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id]))
+                 .join(sendto_lists).on(messages[:sendto_list_id].eq(sendto_lists[:id]))
+                 .project(rooms[:id], 
                              rooms[:public], 
                              rooms[:updated_at], 
                              messages[:room_id], 
@@ -41,20 +39,21 @@ class ApiController < ApplicationController
                              sendto_lists[:id].as('sendto_id'),
                              sendto_lists[:profile_image1].as('sendto_image'), 
                              messages[:body])
-                    .where(rooms[:public].eq(TRUE))
-                    .group(messages[:room_id])
-                    .order(rooms[:updated_at].desc)
-                    .take(10)
-=end
+                 .where(rooms[:public].eq(TRUE))
+                 .where(messages[:id].in(recent_unique_messages))
+                 .order(rooms[:updated_at].desc)
+                 .take(10)
+                
+                 
     
     sql = query.to_sql
-
+    ### .group(messages[:room_id])
     #sql = 'SELECT MIN(R.id), R.public, R.updated_at, M.room_id, M.sendfrom_list_id, M.sendto_list_id, M.body FROM rooms AS R, messages AS M WHERE R.public = "t" AND M.room_id = R.id GROUP BY M.room_id ORDER BY R.updated_at DESC LIMIT 10;'
     results = ActiveRecord::Base.connection.execute(sql)
 
     val = []
 
-#    results.each do |result|
+    results.each do |result|
       #sendfrom_image, sendto_image, sendto_message = nil
 =begin
       obj1 = List.select(:profile_image1).where('id = ?', result["sendfrom_list_id"]).first
@@ -62,7 +61,7 @@ class ApiController < ApplicationController
       obj2 = List.select(:profile_image1).where('id = ?', result["sendto_list_id"]).first
       sendto_image = obj2["profile_image1"]
 =end
-=begin
+
       obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_id"]).order('id DESC').first
       #もし相手がメッセージ未返信だった場合を想定
       if obj3 then
@@ -82,9 +81,9 @@ class ApiController < ApplicationController
         :sendto_message => sendto_message
       })
     end
-=end
+
     respond_to do |format|
-      format.json { render json: results}#val }
+      format.json { render json: val }
     end
 
   end

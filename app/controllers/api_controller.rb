@@ -27,7 +27,6 @@ class ApiController < ApplicationController
     query = messages.join(rooms).on(predicate)
                     .project(rooms[:id].minimum)
                     .group(messages[:room_id])
-                    .order(rooms[:updated_at].desc)
                     .take(10)
 =begin
     query = messages.join(rooms).on(predicate)

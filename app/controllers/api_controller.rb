@@ -9,6 +9,7 @@ class ApiController < ApplicationController
     #(2)messages.room_id = rooms.idであること
     #(3)updated_atでDESCにソート
     #(4)rooms.idもしくはmessages.room_idが重複しないもの
+    
     #require 'rubygems'
     #require 'arel'
     #require 'sqlite3'
@@ -26,7 +27,7 @@ class ApiController < ApplicationController
     query = messages.join(rooms).on(predicate)
                     .join(sendfrom_lists).on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id]))
                     .join(sendto_lists).on(messages[:sendto_list_id].eq(sendto_lists[:id]))
-                    .project(rooms[:id], 
+                    .project(rooms[:id].minimum, 
                              rooms[:public], 
                              rooms[:updated_at], 
                              messages[:room_id], 

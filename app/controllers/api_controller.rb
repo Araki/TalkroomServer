@@ -22,7 +22,7 @@ class ApiController < ApplicationController
     rooms = Arel::Table.new(:rooms, :as => 'rooms')#Arel::Table.new(:rooms)
     messages = Arel::Table.new(:messages, :as => 'messages')#Arel::Table.new(:messages)
     
-    recent_unique_messages = messages.project(messages[:id].maximum)
+    recent_unique_messages = messages.project(messages[:id])
                               .group(messages[:room_id])
                               .order(messages[:id].desc)
    

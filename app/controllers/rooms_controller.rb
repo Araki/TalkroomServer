@@ -2,6 +2,7 @@ class RoomsController < ApplicationController
   # GET /rooms
   # GET /rooms.json
   
+  #サービス開始時にはコメントアウトを外す
   #before_filter :check_logined
   
   def index

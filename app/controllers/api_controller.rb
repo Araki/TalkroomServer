@@ -61,7 +61,7 @@ class ApiController < ApplicationController
       obj2 = List.select(:profile_image1).where('id = ?', result["sendto_list_id"]).first
       sendto_image = obj2["profile_image1"]
 =end
-      logger.info(result["sendto_id"])
+      logger.info(result)
       obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_id"]).order('id DESC').first
       #もし相手がメッセージ未返信だった場合を想定
       if obj3 then

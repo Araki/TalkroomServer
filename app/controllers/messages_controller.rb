@@ -46,21 +46,12 @@ class MessagesController < ApplicationController
   def create
     #作成中　POST送信
     query = params[:message]
-    receive_data = JSON.parse(query)
-    
-    logger.info(receive_data['sendfrom_list_id'])
-    logger.info(receive_data['sendto_list_id'])
-    logger.info(receive_data['room_id'])
-    logger.info(receive_data['body'])
-    
+  
     @message = Message.new
-    @message.sendfrom_list_id = receive_data['sendfrom_list_id']
-    @message.sendto_list_id = receive_data['sendto_list_id']
-    @message.room_id = receive_data['room_id']
-    @message.body = receive_data['body']
-    #作成中終わり
-    
-    #@message = Message.new(params[:message])
+    @message.sendfrom_list_id = query['sendfrom_list_id']
+    @message.sendto_list_id = query['sendto_list_id']
+    @message.room_id = query['room_id']
+    @message.body = query['body']
 
     respond_to do |format|
       if @message.save

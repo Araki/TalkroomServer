@@ -128,7 +128,7 @@ PLATFORMS
 DEPENDENCIES
   coffee-rails (~> 3.2.1)
   jquery-rails
-  mysql
+  mysql (= 2.9.1)
   mysql2 (= 0.2.7)
   omniauth
   omniauth-facebook

@@ -19,7 +19,8 @@ test:
   timeout: 5000
 
 production:
-  adapter: pg
-  database: db/production.pg
+  adapter: mysql #pg
+  encoding: utf8
+  database: talkroom_database#db/production.pg
   pool: 5
   timeout: 5000

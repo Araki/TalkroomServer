@@ -59,7 +59,7 @@ GEM
     mime-types (1.25.1)
     multi_json (1.8.4)
     multipart-post (1.2.0)
-    mysql (2.9.1)
+    mysql2 (0.3.15)
     oauth2 (0.8.1)
       faraday (~> 0.8)
       httpauth (~> 0.1)
@@ -127,7 +127,7 @@ PLATFORMS
 DEPENDENCIES
   coffee-rails (~> 3.2.1)
   jquery-rails
-  mysql
+  mysql2
   omniauth
   omniauth-facebook
   rails (= 3.2.6)

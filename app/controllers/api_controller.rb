@@ -50,7 +50,7 @@ class ApiController < ApplicationController
     logger.info(sql)
     ### .group(messages[:room_id])
     #sql = 'SELECT MIN(R.id), R.public, R.updated_at, M.room_id, M.sendfrom_list_id, M.sendto_list_id, M.body FROM rooms AS R, messages AS M WHERE R.public = "t" AND M.room_id = R.id GROUP BY M.room_id ORDER BY R.updated_at DESC LIMIT 10;'
-    results = ActiveRecord::Base.connection.select(sql)#ActiveRecord::Base.connection.execute(sql)
+    results = ActiveRecord::Base.connection.select(sql) #ActiveRecord::Base.connection.execute(sql)
     
 
     val = []

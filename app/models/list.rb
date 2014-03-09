@@ -23,7 +23,7 @@ class List < ActiveRecord::Base
   
   validates :email,
     :presence => true,
-    :uniqueness => true,
+    #:uniqueness => true,
     :length => { :maximum => 50 },
     :format => { :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i }
     

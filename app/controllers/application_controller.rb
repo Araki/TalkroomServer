@@ -26,8 +26,4 @@ class ApplicationController < ActionController::Base
     end
   end
   
-  def get_data_from_database(sql)
-    
-  end
-  
 end

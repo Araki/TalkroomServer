@@ -348,7 +348,7 @@ class ApiController < ApplicationController
       timetext = "1分以内"
     elsif minutes < 60 then
       timetext = minutes.round.to_s + "分前"
-      logger.info(timetex)
+      logger.info(timetext)
     else
       hours = minutes / 60
         

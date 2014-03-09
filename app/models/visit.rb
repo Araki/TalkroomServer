@@ -1,5 +1,5 @@
 class Visit < ActiveRecord::Base
-  attr_accessible :visit_at, :visitor
+  attr_accessible :visitor_list_id, :visitat_list_id
   
   #==========
   #アソシエーションの設定
@@ -13,10 +13,10 @@ class Visit < ActiveRecord::Base
   #バリデーションの設定
   #==========
   
-  validates :visitor,
+  validates :visitor_list_id,
     :presence => true
     
-  validates :visit_at,
+  validates :visitat_list_id,
     :presence => true
     
 end

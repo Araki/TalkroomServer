@@ -10,7 +10,7 @@ class VisitsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @visits }
+      format.json { render :json => @visits }
     end
   end
 
@@ -21,7 +21,7 @@ class VisitsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @visit }
+      format.json { render :json => @visit }
     end
   end
 
@@ -32,7 +32,7 @@ class VisitsController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @visit }
+      format.json { render :json => @visit }
     end
   end
 
@@ -48,11 +48,11 @@ class VisitsController < ApplicationController
 
     respond_to do |format|
       if @visit.save
-        format.html { redirect_to @visit, notice: 'Visit was successfully created.' }
-        format.json { render json: @visit, status: :created, location: @visit }
+        format.html { redirect_to @visit, :notice => 'Visit was successfully created.' }
+        format.json { render :json => @visit, :status => :created, :location => @visit }
       else
-        format.html { render action: "new" }
-        format.json { render json: @visit.errors, status: :unprocessable_entity }
+        format.html { render :action => "new" }
+        format.json { render :json => @visit.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -64,11 +64,11 @@ class VisitsController < ApplicationController
 
     respond_to do |format|
       if @visit.update_attributes(params[:visit])
-        format.html { redirect_to @visit, notice: 'Visit was successfully updated.' }
+        format.html { redirect_to @visit, :notice => 'Visit was successfully updated.' }
         format.json { head :no_content }
       else
-        format.html { render action: "edit" }
-        format.json { render json: @visit.errors, status: :unprocessable_entity }
+        format.html { render :action => "edit" }
+        format.json { render :json => @visit.errors, :status => :unprocessable_entity }
       end
     end
   end

@@ -22,27 +22,36 @@ class ApiController < ApplicationController
     rooms = Arel::Table.new(:rooms, :as => 'rooms')#Arel::Table.new(:rooms)
     messages = Arel::Table.new(:messages, :as => 'messages')#Arel::Table.new(:messages)
     
-    recent_unique_messages = messages.project(messages[:id])
-                              .group(messages[:room_id])
-                              .order(messages[:id].desc)
+    recent_unique_messages = messages.
+                             project(messages[:id]).
+                             group(messages[:room_id]).
+                             order(messages[:id].desc)
    
                   
-    query = rooms.join(messages).on(messages[:room_id].eq(rooms[:id]))
-                 .join(sendfrom_lists).on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id]))
-                 .join(sendto_lists).on(messages[:sendto_list_id].eq(sendto_lists[:id]))
-                 .project(rooms[:id], 
-                             rooms[:public], 
-                             rooms[:updated_at], 
-                             messages[:room_id], 
-                             sendfrom_lists[:id].as('sendfrom_id'), 
-                             sendfrom_lists[:profile_image1].as('sendfrom_image'), 
-                             sendto_lists[:id].as('sendto_id'),
-                             sendto_lists[:profile_image1].as('sendto_image'), 
-                             messages[:body])
-                 .where(rooms[:public].eq(TRUE))
-                 .where(messages[:id].in(recent_unique_messages))
-                 .order(rooms[:updated_at].desc)
-                 .take(10)
+    query = rooms.
+            join(messages).
+            on(messages[:room_id].
+            eq(rooms[:id])).
+            join(sendfrom_lists).
+            on(messages[:sendfrom_list_id].
+            eq(sendfrom_lists[:id])).
+            join(sendto_lists).
+            on(messages[:sendto_list_id].
+            eq(sendto_lists[:id])).
+            project(rooms[:id], 
+                    rooms[:public], 
+                    rooms[:updated_at], 
+                    messages[:room_id], 
+                    sendfrom_lists[:id].as('sendfrom_id'), 
+                    sendfrom_lists[:profile_image1].as('sendfrom_image'), 
+                    sendto_lists[:id].as('sendto_id'),
+                    sendto_lists[:profile_image1].as('sendto_image'), 
+                    messages[:body]
+                    ).
+            where(rooms[:public].eq(TRUE)).
+            where(messages[:id].in(recent_unique_messages)).
+            order(rooms[:updated_at].desc).
+            take(10)
                 
                  
     
@@ -85,7 +94,7 @@ class ApiController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render json: val }
+      format.json { render :json => val }
     end
 
   end
@@ -188,7 +197,7 @@ class ApiController < ApplicationController
     end
     
     respond_to do |format|
-      format.json { render json: val }
+      format.json { render :json => val }
     end
   end
   
@@ -233,7 +242,7 @@ class ApiController < ApplicationController
     end
     
     respond_to do |format|
-      format.json { render json: val }
+      format.json { render :json => val }
     end
     
   end
@@ -263,7 +272,7 @@ class ApiController < ApplicationController
     end
     
     respond_to do |format|
-      format.json { render json: val }
+      format.json { render :json => val }
     end
     
   end
@@ -277,7 +286,7 @@ class ApiController < ApplicationController
     result = List.find(params[:user_id])
     
     respond_to do |format|
-      format.json { render json: result }
+      format.json { render :json => result }
     end
   end
   
@@ -319,7 +328,7 @@ class ApiController < ApplicationController
     end
     
     respond_to do |format|
-      format.json { render json: val }
+      format.json { render :json => val }
     end
     
   end

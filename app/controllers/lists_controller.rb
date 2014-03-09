@@ -9,7 +9,7 @@ class ListsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @lists }
+      format.json { render :json => @lists }
     end
   end
 
@@ -20,7 +20,7 @@ class ListsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @list }
+      format.json { render :json => @list }
     end
   end
 
@@ -31,7 +31,7 @@ class ListsController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @list }
+      format.json { render :json => @list }
     end
   end
 
@@ -47,11 +47,11 @@ class ListsController < ApplicationController
 
     respond_to do |format|
       if @list.save
-        format.html { redirect_to @list, notice: 'List was successfully created.' }
-        format.json { render json: @list, status: :created, location: @list }
+        format.html { redirect_to @list, :notice => 'List was successfully created.' }
+        format.json { render :json => @list, :status => :created, :location => @list }
       else
-        format.html { render action: "new" }
-        format.json { render json: @list.errors, status: :unprocessable_entity }
+        format.html { render :action => "new" }
+        format.json { render :json => @list.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -63,11 +63,11 @@ class ListsController < ApplicationController
 
     respond_to do |format|
       if @list.update_attributes(params[:list])
-        format.html { redirect_to @list, notice: 'List was successfully updated.' }
+        format.html { redirect_to @list, :notice => 'List was successfully updated.' }
         format.json { head :no_content }
       else
-        format.html { render action: "edit" }
-        format.json { render json: @list.errors, status: :unprocessable_entity }
+        format.html { render :action => "edit" }
+        format.json { render :json => @list.errors, :status => :unprocessable_entity }
       end
     end
   end

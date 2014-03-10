@@ -101,9 +101,18 @@
 </p>
 
 <p>
-  <b>point:</b>
+  <b>last_logined:</b>
   <%= @list.last_logined %>
 </p>
 
+<p>
+  <b>created_at:</b>
+  <%= @list.created_at %>
+</p>
+
+<p>
+  <b>updated_at:</b>
+  <%= @list.updated_at %>
+</p>
 <%= link_to 'Edit', edit_list_path(@list) %> |
 <%= link_to 'Back', lists_path %>

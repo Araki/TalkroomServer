@@ -132,11 +132,13 @@ class ApiController < ApplicationController
     
     sql = sql + 'ORDER BY last_logined DESC LIMIT 20;'
     
-    results = ActiveRecord::Base.connection.execute(sql)
+    results = ActiveRecord::Base.connection.select(sql)
     
     val = []
     
     results.each do |result|
+      logger.info("++++++++++++++")
+      logger.info(result)
       logintime = exchangeTime(result["last_logined"].to_time)
 =begin    
     #現在時刻の取得

@@ -15,7 +15,7 @@ class ApiController < ApplicationController
     #require 'sqlite3'
     #require 'active_record'
     
-    Arel::Table.engine = Arel::Sql::Engine.new(ActiveRecord::Base)
+    #Arel::Table.engine = Arel::Sql::Engine.new(ActiveRecord::Base)
     
     sendto_lists = Arel::Table.new(:lists, :as => 'sendto_lists')#Arel::Table.new(:lists)
     sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')#Arel::Table.new(:lists)
@@ -137,52 +137,8 @@ class ApiController < ApplicationController
     val = []
     
     results.each do |result|
-      logger.info("++++++++++++++")
-      logger.info(result)
+      
       logintime = exchangeTime(result["last_logined"].to_time)
-=begin    
-    #現在時刻の取得
-    now = Time.now.utc
-    logger.info(now)
-    
-    results.each do |result|
-      
-      lastlogined = result["last_logined"].to_time
-      
-      seconds = now - lastlogined
-      minutes = seconds / 60
-      
-      if minutes < 1 then
-        logintime = "1分以内"
-      elsif minutes < 60 then
-        logintime = minutes.round.to_s + "分前"
-        logger.info(logintime)
-      else
-        hours = minutes / 60
-        
-        if hours < 24 then
-          logintime = hours.round.to_s + "時間前"
-          logger.info(logintime)
-        else
-          days = hours / 24
-          
-          if days < 7 then
-            logintime = days.round.to_s + "日前"
-            logger.info(logintime)
-          else
-            weeks = days / 7
-            
-            if weeks < 4 then
-              logintime = weeks.round.to_s + "週間前"
-              logger.info(logintime)
-            else
-              logintime = "1ヶ月以上前"
-              logger.info(logintime)
-            end
-          end
-        end
-      end 
-=end     
 
       val.push({
         :id => result["id"], 
@@ -213,10 +169,10 @@ class ApiController < ApplicationController
   def get_oneside_rooms
     #（１）USERがメッセージを送った相手全員のIDを取得
     sql1 = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE R.id = M.room_id AND M.sendfrom_list_id = ' + params[:user_id] + ' GROUP BY M.sendto_list_id ORDER BY R.updated_at DESC;'
-    results = ActiveRecord::Base.connection.execute(sql1)
+    results = ActiveRecord::Base.connection.select(sql1)
     #（２）双方向でメッセージを送りあった相手全員のIDを取得
-    sql2 = 'SELECT DISTINCT sendfrom_list_id FROM messages WHERE sendfrom_list_id = ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + params[:user_id] + ') GROUP BY sendfrom_list_id;'
-    mutual_send_users = ActiveRecord::Base.connection.execute(sql2)
+    sql2 = 'SELECT DISTINCT sendfrom_list_id FROM messages WHERE sendfrom_list_id IN ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + params[:user_id] + ') GROUP BY sendfrom_list_id;'
+    mutual_send_users = ActiveRecord::Base.connection.select(sql2)
     
     val =[]
     
@@ -254,8 +210,8 @@ class ApiController < ApplicationController
   #ユーザーID：user_id
   def get_bothside_rooms
     #双方向でメッセージを送りあった相手全員のIDを取得
-    sql = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE M.sendfrom_list_id = ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + params[:user_id] + ') GROUP BY M.sendfrom_list_id ORDER BY R.updated_at DESC;'
-    results = ActiveRecord::Base.connection.execute(sql)
+    sql = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE M.sendfrom_list_id IN ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + params[:user_id] + ') GROUP BY M.sendfrom_list_id ORDER BY R.updated_at DESC;'
+    results = ActiveRecord::Base.connection.select(sql)
     
     val = []
     
@@ -298,7 +254,7 @@ class ApiController < ApplicationController
   #ユーザーID：user_id
   def get_user_rooms
     sql = 'SELECT MIN(R.id), R.public, R.updated_at, M.room_id, M.sendfrom_list_id, M.sendto_list_id, M.body FROM rooms AS R, messages AS M WHERE R.public = "t" AND M.room_id = R.id AND ( M.sendfrom_list_id = ' + params[:user_id] + ' OR M.sendto_list_id = ' + params[:user_id] + ' ) GROUP BY M.room_id ORDER BY R.updated_at DESC LIMIT 10;'
-    results = ActiveRecord::Base.connection.execute(sql)
+    results = ActiveRecord::Base.connection.select(sql)
     
     val = []
     

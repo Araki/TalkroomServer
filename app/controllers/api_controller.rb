@@ -10,23 +10,18 @@ class ApiController < ApplicationController
     #(3)updated_atでDESCにソート
     #(4)rooms.idもしくはmessages.room_idが重複しないもの
     
-    #require 'rubygems'
-    #require 'arel'
-    #require 'sqlite3'
-    #require 'active_record'
-    
-    #Arel::Table.engine = Arel::Sql::Engine.new(ActiveRecord::Base)
-    
-    sendto_lists = Arel::Table.new(:lists, :as => 'sendto_lists')#Arel::Table.new(:lists)
-    sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')#Arel::Table.new(:lists)
-    rooms = Arel::Table.new(:rooms, :as => 'rooms')#Arel::Table.new(:rooms)
-    messages = Arel::Table.new(:messages, :as => 'messages')#Arel::Table.new(:messages)
+    sendto_lists = Arel::Table.new(:lists, :as => 'sendto_lists')
+    sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')
+    rooms = Arel::Table.new(:rooms, :as => 'rooms')
+    messages = Arel::Table.new(:messages, :as => 'messages')
     
     recent_unique_messages = messages.
                              project(messages[:id]).
                              group(messages[:room_id]).
                              order(messages[:id].desc)
-   
+   logger.info("+++++++++++++++++++++++++++")
+   logger.info(recent_unique_messages.to_sql)
+ 
                   
     query = rooms.
             join(messages).
@@ -47,6 +42,7 @@ class ApiController < ApplicationController
                     ).
             where(rooms[:public].eq(TRUE)).
             where(messages[:id].in(recent_unique_messages)).
+            group(messages[:room_id]).
             order(rooms[:updated_at].desc).
             take(10)
                 
@@ -62,13 +58,7 @@ class ApiController < ApplicationController
     val = []
 
     results.each do |result|
-      #sendfrom_image, sendto_image, sendto_message = nil
-=begin
-      obj1 = List.select(:profile_image1).where('id = ?', result["sendfrom_list_id"]).first
-      sendfrom_image = obj1["profile_image1"]
-      obj2 = List.select(:profile_image1).where('id = ?', result["sendto_list_id"]).first
-      sendto_image = obj2["profile_image1"]
-=end
+ 
       logger.info(result)
       obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_id"]).order('id DESC').first
       #もし相手がメッセージ未返信だった場合を想定
@@ -83,8 +73,10 @@ class ApiController < ApplicationController
       val.push({
         :room_id => result["room_id"], 
         :updated_at => updatedtime,
-        :sendfrom_image => result["sendfrom_image"], 
+        :sendfrom_id => result["sendfrom_id"],
+        :sendfrom_image => result["sendfrom_image"],
         :sendfrom_message => result["body"], 
+        :sendto_id => result["sendto_id"],
         :sendto_image => result["sendto_image"],
         :sendto_message => sendto_message
       })
@@ -106,29 +98,35 @@ class ApiController < ApplicationController
   #目的：purpose
   def get_search_users
     
-    sql = 'SELECT id, nickname, age, profile_image1, profile, area, purpose, last_logined FROM lists '
-    if params[:age] == "" && params[:area] == "" && params[:purpose] == "" then
-    else
-      sql = sql + "WHERE "
-      if params[:age] != "" then
-        sql = sql + 'age = ' + params[:age] + ' '
-      end
-      if params[:area] != "" then
-        if params[:age] != "" then
-          sql = sql + 'AND '
-        end
-        sql = sql + 'area = ' + params[:area] + ' '
-      end
-      if params[:purpose] != "" then
-        if params[:age] != "" || params[:area] != "" then
-          sql = sql + 'AND '
-        end
-        sql = sql + 'purpose = ' + params[:purpose] + ' '
-      end
+    lists = Arel::Table.new(:lists, :as => 'rooms')
+    rooms = Arel::Table.new(:rooms, :as => 'rooms')
+    
+    query = lists.
+            project(lists[:id],
+                    lists[:nickname],
+                    lists[:age],
+                    lists[:profile_image1],
+                    lists[:profile],
+                    lists[:area],
+                    lists[:purpose],
+                    lists[:last_logined]
+            ).
+            order(lists[:last_logined].desc)
+            
+    if params[:age] != "" then
+      query = query.where(lists[:age].eq(params[:age]))
     end
-    
-    sql = sql + 'ORDER BY last_logined DESC LIMIT 20;'
-    
+    if params[:area] != "" then
+      query = query.where(lists[:area].eq(params[:area]))
+    end
+    if params[:purpose] != "" then
+      query = query.where(lists[:purpose].eq(params[:purpose]))
+    end
+            
+    sql = query.to_sql
+    logger.info("============================")
+    logger.info(sql)    
+
     results = ActiveRecord::Base.connection.select(sql)
     
     val = []
@@ -145,8 +143,8 @@ class ApiController < ApplicationController
         :profile => result["profile"],
         :area => result["area"],
         :purpose => result["purpose"],
-        :last_logined => logintime,
-        :room_id => result["room_id"]
+        :last_logined => logintime
+        #:room_id => result["room_id"]
       })
 
     end
@@ -210,23 +208,13 @@ class ApiController < ApplicationController
     rooms = Arel::Table.new(:rooms, :as => 'rooms')#Arel::Table.new(:rooms)
     messages = Arel::Table.new(:messages, :as => 'messages')#Arel::Table.new(:messages)
 
-    #このユーザーがメッセージを送った相手のユニークなルームIDリスト(A)
+    #このユーザーがメッセージを送った相手のユニークなルームIDリスト
     sendtoLists =  messages.
                    project(messages[:room_id]).
                    where(messages[:sendto_list_id].eq(params[:user_id])).
                    group(messages[:room_id]).
                    order(messages[:id].desc) 
 
-    #このユーザーにメッセージを送った相手のユニークなルームIDリスト(B)
-    #sendfromLists = Message.select('room_id').where('sendto_list_id = ?', params[:user_id]).group('room_id').order('id DESC')
-=begin
-    sendfromLists = messages.
-                    project(messages[:room_id]).
-                    where(messages[:sendfrom_list_id].eq(params[:user_id])).
-                    group(messages[:room_id].in(recent_unique_messages)).
-                    order(messages[:id].desc)   
-=end     
-    #AとBで重複するルームIDリスト(C)
     query = messages.
             join(rooms).
             on(messages[:room_id].eq(rooms[:id])).
@@ -289,7 +277,32 @@ class ApiController < ApplicationController
   #受け取るクエリ
   #ユーザーID：user_id
   def get_user_rooms
-    sql = 'SELECT MIN(R.id), R.public, R.updated_at, M.room_id, M.sendfrom_list_id, M.sendto_list_id, M.body FROM rooms AS R, messages AS M WHERE R.public = "t" AND M.room_id = R.id AND ( M.sendfrom_list_id = ' + params[:user_id] + ' OR M.sendto_list_id = ' + params[:user_id] + ' ) GROUP BY M.room_id ORDER BY R.updated_at DESC LIMIT 10;'
+    
+    rooms = Arel::Table.new(:rooms, :as => 'rooms')
+    messages = Arel::Table.new(:messages, :as => 'messages')
+    
+    query = rooms.
+            join(messages).
+            on(messages[:room_id].eq(rooms[:id])).
+            project(rooms[:id],
+                    rooms[:public],
+                    rooms[:updated_at],
+                    messages[:room_id],
+                    messages[:sendfrom_list_id],
+                    messages[:sendto_list_id],
+                    messages[:body]
+            ).
+            where(rooms[:public].eq(TRUE)).
+            where(messages[:sendfrom_list_id].eq(params[:user_id]).or(messages[:sendto_list_id].eq(params[:user_id]))).
+            group(messages[:room_id]).
+            order(rooms[:updated_at].desc).
+            take(10)
+            
+    sql = query.to_sql
+    logger.info("============================")
+    logger.info(sql)
+    
+    #sql = 'SELECT MIN(R.id), R.public, R.updated_at, M.room_id, M.sendfrom_list_id, M.sendto_list_id, M.body FROM rooms AS R, messages AS M WHERE R.public = "t" AND M.room_id = R.id AND ( M.sendfrom_list_id = ' + params[:user_id] + ' OR M.sendto_list_id = ' + params[:user_id] + ' ) GROUP BY M.room_id ORDER BY R.updated_at DESC LIMIT 10;'
     results = ActiveRecord::Base.connection.select(sql)
     
     val = []

@@ -30,14 +30,11 @@ class ApiController < ApplicationController
                   
     query = rooms.
             join(messages).
-            on(messages[:room_id].
-            eq(rooms[:id])).
+            on(messages[:room_id].eq(rooms[:id])).
             join(sendfrom_lists).
-            on(messages[:sendfrom_list_id].
-            eq(sendfrom_lists[:id])).
+            on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id])).
             join(sendto_lists).
-            on(messages[:sendto_list_id].
-            eq(sendto_lists[:id])).
+            on(messages[:sendto_list_id].eq(sendto_lists[:id])).
             project(rooms[:id], 
                     rooms[:public], 
                     rooms[:updated_at], 
@@ -193,7 +190,7 @@ class ApiController < ApplicationController
         :nickname => obj["nickname"], 
         :profile_image => obj["profile_image1"], 
         :profile => obj["profile"], 
-        :room_updated => result["updated_at"], 
+        :room_updated => exchangeTime( result["updated_at"].to_time ), 
         :room_public => result["public"], 
         :room_id => result["room_id"]
       })
@@ -209,8 +206,47 @@ class ApiController < ApplicationController
   #受け取るクエリ
   #ユーザーID：user_id
   def get_bothside_rooms
+
+    rooms = Arel::Table.new(:rooms, :as => 'rooms')#Arel::Table.new(:rooms)
+    messages = Arel::Table.new(:messages, :as => 'messages')#Arel::Table.new(:messages)
+
+    #このユーザーがメッセージを送った相手のユニークなルームIDリスト(A)
+    sendtoLists =  messages.
+                   project(messages[:room_id]).
+                   where(messages[:sendto_list_id].eq(params[:user_id])).
+                   group(messages[:room_id]).
+                   order(messages[:id].desc) 
+
+    #このユーザーにメッセージを送った相手のユニークなルームIDリスト(B)
+    #sendfromLists = Message.select('room_id').where('sendto_list_id = ?', params[:user_id]).group('room_id').order('id DESC')
+=begin
+    sendfromLists = messages.
+                    project(messages[:room_id]).
+                    where(messages[:sendfrom_list_id].eq(params[:user_id])).
+                    group(messages[:room_id].in(recent_unique_messages)).
+                    order(messages[:id].desc)   
+=end     
+    #AとBで重複するルームIDリスト(C)
+    query = messages.
+            join(rooms).
+            on(messages[:room_id].eq(rooms[:id])).
+            project(messages[:id],
+                    messages[:sendfrom_list_id],
+                    messages[:sendto_list_id],
+                    messages[:room_id],
+                    rooms[:public],
+                    rooms[:updated_at]
+            ).
+            where(messages[:room_id].in(sendtoLists)).
+            where(messages[:sendfrom_list_id].eq(params[:user_id])).
+            group(messages[:room_id]).
+            order(messages[:id].desc)
+            
+    sql = query.to_sql
+    logger.info("============================")
+    logger.info(sql)
+    
     #双方向でメッセージを送りあった相手全員のIDを取得
-    sql = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE M.sendfrom_list_id IN ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + params[:user_id] + ') GROUP BY M.sendfrom_list_id ORDER BY R.updated_at DESC;'
     results = ActiveRecord::Base.connection.select(sql)
     
     val = []

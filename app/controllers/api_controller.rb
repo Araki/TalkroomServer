@@ -337,8 +337,35 @@ class ApiController < ApplicationController
     respond_to do |format|
       format.json { render :json => val }
     end
+  end
+  
+  
+  
+  
+  
+  
+  def update_profile
+
+    id = params[:user_id]
+    profile = params[:profile]
+     
+    logger.info("ID===========")
+    logger.info(params[:user_id])
+    logger.info("Profile===========")
+    logger.info(params[:profile])
+    
+    @list = List.find(id)
+  
+    respond_to do |format|
+      if @list.update_attribute(:profile, profile)
+        format.json { render :json => @list.profile, :status => 200 }
+      else
+        format.json { render :json => @list.errors, :status => :unprocessable_entity }
+      end
+    end
     
   end
+  
   
   #時間を「〜分前」に変換するメソッド
   def exchangeTime(time)

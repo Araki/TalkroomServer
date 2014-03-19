@@ -50,9 +50,8 @@ class ApiController < ApplicationController
     
     sql = query.to_sql
     logger.info(sql)
-    ### .group(messages[:room_id])
-    #sql = 'SELECT MIN(R.id), R.public, R.updated_at, M.room_id, M.sendfrom_list_id, M.sendto_list_id, M.body FROM rooms AS R, messages AS M WHERE R.public = "t" AND M.room_id = R.id GROUP BY M.room_id ORDER BY R.updated_at DESC LIMIT 10;'
-    results = ActiveRecord::Base.connection.select(sql) #ActiveRecord::Base.connection.execute(sql)
+
+    results = ActiveRecord::Base.connection.select(sql) 
     
 
     val = []
@@ -87,6 +86,12 @@ class ApiController < ApplicationController
     end
 
   end
+  
+  
+  
+  
+  
+  
   
   
   
@@ -158,6 +163,10 @@ class ApiController < ApplicationController
   
   
   
+  
+  
+  
+  
   #トーク画面のアタック中のリスト結果を返すAPI
   #受け取るクエリ
   #ユーザーID：user_id
@@ -199,6 +208,15 @@ class ApiController < ApplicationController
     end
     
   end
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   #トーク画面のトーク中のリスト結果を返すAPI
   #受け取るクエリ
@@ -261,16 +279,66 @@ class ApiController < ApplicationController
   
   
   
+  
+  
+  
+  
+  
+  
   #あるユーザーの詳細画面
   #受け取るクエリ
   #ユーザーID：user_id
   def get_detail_profile
-    result = List.find(params[:user_id])
+    result = List.
+             where('id = ?', params[:user_id]).
+             select("id, 
+                    nickname, 
+                    profile_image1, 
+                    profile_image2, 
+                    profile_image3, 
+                    age, 
+                    area, 
+                    purpose, 
+                    profile, 
+                    tall, 
+                    blood, 
+                    style, 
+                    holiday, 
+                    alcohol, 
+                    cigarette, 
+                    salary").first
+    
+    val = []
+    val.push({
+        :id => result["id"], 
+        :nickname => result["nickname"], 
+        :profile_image1 => result["profile_image1"], 
+        :profile_image2 => result["profile_image2"], 
+        :profile_image3 => result["profile_image3"], 
+        :age => result["age"], 
+        :area => result["area"], 
+        :purpose => result["purpose"], 
+        :profile => result["profile"], 
+        :tall => result["tall"], 
+        :blood => result["blood"], 
+        :style => result["style"], 
+        :holiday => result["holiday"], 
+        :alcohol => result["alcohol"], 
+        :cigarette => result["cigarette"], 
+        :salary => result["salary"]
+      })
     
     respond_to do |format|
-      format.json { render :json => result }
+      format.json { render :json => val }
     end
   end
+  
+  
+  
+  
+  
+  
+  
   
   
   #あるユーザーのルームリストを返す
@@ -339,9 +407,13 @@ class ApiController < ApplicationController
     end
   end
   
-  
-  
-  
+    
+    
+    
+    
+    
+    
+    
   
   
   def update_profile

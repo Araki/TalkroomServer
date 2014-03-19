@@ -6,6 +6,7 @@ Talkroom::Application.routes.draw do
   match "/get_bothside_rooms" => "api#get_bothside_rooms"
   match "/get_detail_profile" => "api#get_detail_profile"
   match "/get_user_rooms" => "api#get_user_rooms"
+  match "/get_user_profile" => "api#get_user_profile"
   match "/update_profile" => "api#update_profile"
   
   resources :visits

@@ -411,6 +411,74 @@ class ApiController < ApplicationController
     
     
     
+  #sendfromIDとsendtoIDからroomIDとメッセージのハッシュ配列を降順に取得
+  #受け取るクエリ
+  #送信者ID：sendfrom
+  #受信者ID：sendto
+  def get_room_message
+    sendto_lists = Arel::Table.new(:lists, :as => 'sendto_lists')
+    sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')
+    messages = Arel::Table.new(:messages, :as => 'messages')
+    
+    query = messages.
+            join(sendfrom_lists).
+            on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id])).
+            join(sendto_lists).
+            on(messages[:sendto_list_id].eq(sendto_lists[:id])).
+            project(messages[:id],
+                    messages[:room_id],
+                    messages[:sendfrom_list_id],
+                    sendfrom_lists[:profile_image1].as('sendfrom_image'),
+                    messages[:sendto_list_id],
+                    sendto_lists[:profile_image1].as('sendto_image'), 
+                    messages[:body],
+                    messages[:created_at]
+            ).
+            where(messages[:sendfrom_list_id].eq(params[:sendfrom]).or(messages[:sendfrom_list_id].eq(params[:sendto]))).
+            where(messages[:sendto_list_id].eq(params[:sendfrom]).or(messages[:sendto_list_id].eq(params[:sendto]))).
+            order(messages[:id].asc).
+            take(10)
+            
+    sql = query.to_sql
+    logger.info("============================")
+    logger.info(sql)
+    
+    results = ActiveRecord::Base.connection.select(sql)
+    
+    val = []
+    
+    #ハッシュ配列を整形
+    results.each do |result|
+      logger.info("=======================")
+      logger.info(result["created_at"].year)
+      logger.info(result["created_at"].month)
+      logger.info(result["created_at"].day)
+      logger.info(result["created_at"].hour)
+      logger.info(result["created_at"].min)
+      val.push({
+        :id => result["id"],
+        :room_id => result["room_id"],
+        :sendfrom_list_id => result["sendfrom_list_id"],
+        :sendfrom_image => result["sendfrom_image"],
+        :sendto_list_id => result["sendto_list_id"],
+        :sendto_image => result["sendto_image"],
+        :body => result["body"],
+        :year => sprintf('%04d', result["created_at"].year),
+        :month => sprintf('%02d', result["created_at"].month),
+        :day => sprintf('%02d', result["created_at"].day),
+        :hour => sprintf('%02d', result["created_at"].hour),
+        :min => sprintf('%02d', result["created_at"].min)
+      })
+    end
+      
+    respond_to do |format|
+      format.json { render :json => val }
+    end
+  end
+    
+    
+    
+    
     
     
     
@@ -435,8 +503,47 @@ class ApiController < ApplicationController
         format.json { render :json => @list.errors, :status => :unprocessable_entity }
       end
     end
-    
   end
+  
+  
+  
+  
+  def update_detail_profile
+     
+    logger.info("ID:#{params[:user_id]}")
+    logger.info("NICKNAME:#{params[:nickname]}")
+    logger.info("AGE:#{params[:age]}")
+    logger.info("PURPOSE:#{params[:purpose]}")
+    logger.info("AREA:#{params[:area]}")
+    logger.info("TALL:#{params[:tall]}")    
+    logger.info("BLOOD:#{params[:blood]}")    
+    logger.info("STYLE:#{params[:style]}")
+    logger.info("HOLIDAY:#{params[:holiday]}")
+    logger.info("ALCOHOL:#{params[:alcohol]}")
+    logger.info("CIGARETTE:#{params[:cigarette]}")
+    logger.info("SALARY:#{params[:salary]}")
+
+    @list = List.find(params[:user_id])
+  
+    respond_to do |format|
+      if @list.update_attributes(:nickname => params[:nickname],
+                                 :age => params[:age],
+                                 :purpose => params[:purpose],
+                                 :area => params[:area],
+                                 :tall => params[:tall],
+                                 :blood => params[:blood],
+                                 :style => params[:style],
+                                 :holiday => params[:holiday],
+                                 :alcohol => params[:alcohol],
+                                 :cigarette => params[:cigarette],
+                                 :salary => params[:salary])
+        format.json { render :json => @list, :status => 200 }
+      else
+        format.json { render :json => @list.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+  
   
   
   #時間を「〜分前」に変換するメソッド

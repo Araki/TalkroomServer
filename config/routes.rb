@@ -8,8 +8,11 @@ Talkroom::Application.routes.draw do
   match "/get_user_rooms" => "api#get_user_rooms"
   match "/get_user_profile" => "api#get_user_profile"
   match "/get_room_message" => "api#get_room_message"
+  
   match "/update_profile" => "api#update_profile"
   match "/update_detail_profile" => "api#update_detail_profile" 
+  
+  match "/creat_message" => "api#creat_message"
   
   resources :visits
 

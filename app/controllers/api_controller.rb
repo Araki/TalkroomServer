@@ -545,6 +545,92 @@ class ApiController < ApplicationController
   end
   
   
+  #sendto_list_id
+  #sendfrom_list_id
+  #body
+  
+  #sendtoとsendfromでメッセージを検索
+  #もしレコードがあった場合、そのレコードのroom_idでレコードを登録
+  #もしレコードがなかった場合、roomsでルームを作り、そのroom_idでレコードを作る
+  def creat_message
+
+    logger.info("Message===========")
+    logger.info(params[:body])
+    logger.info(params[:sendto_list_id])
+    logger.info(params[:sendfrom_list_id])
+    
+    messages = Arel::Table.new(:messages, :as => 'messages')
+    sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')
+    
+    query = messages.
+            join(sendfrom_lists).
+            on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id])).
+            project(messages[:id],
+                    messages[:room_id],
+                    messages[:sendfrom_list_id],
+                    sendfrom_lists[:profile_image1].as('sendfrom_image'),
+                    messages[:sendto_list_id]
+            ).
+            where(messages[:sendfrom_list_id].eq(params[:sendfrom_list_id]).or(messages[:sendfrom_list_id].eq(params[:sendto_list_id]))).
+            where(messages[:sendto_list_id].eq(params[:sendfrom_list_id]).or(messages[:sendto_list_id].eq(params[:sendto_list_id]))).
+            order(messages[:id].asc).
+            take(1)
+            
+    sql = query.to_sql
+    logger.info("============================")
+    logger.info(sql)
+    
+    results = ActiveRecord::Base.connection.select(sql)
+    
+    results.each do |result|
+        @room_number = result["room_id"]
+        @sendfrom_image = result["sendfrom_image"]
+    end
+    
+    
+    if results.count < 1 then
+      #レコードが一つもないので、新しくroomsモデルにroomを作成
+      @room = Room.new
+      @room.public = TRUE
+      @room.message_number = 1
+      @room.save
+      
+      @message = Message.new
+      @message.sendfrom_list_id = params[:sendfrom_list_id]
+      @message.sendto_list_id = params[:sendto_list_id]
+      @message.room_id = @room.id
+      @message.body = params[:body]
+      
+    else
+      #レコードがある場合
+      
+      @message = Message.new
+      @message.sendfrom_list_id = params[:sendfrom_list_id]
+      @message.sendto_list_id = params[:sendto_list_id]
+      @message.room_id = @room_number
+      @message.body = params[:body]
+    end
+    
+    respond_to do |format|
+      if @message.save
+        val = []
+        val.push({
+        :sendfrom_list_id => @message.sendfrom_list_id,
+        :sendfrom_image => @sendfrom_image,
+        :sendto_list_id => @message.sendto_list_id,
+        :room_id => @message.room_id,
+        :body => @message.body
+       })
+        
+        format.json { render :json => val, :status => 200 }
+      else
+        format.json { render :json => @message.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+  
+  
+  
   
   #時間を「〜分前」に変換するメソッド
   def exchangeTime(time)

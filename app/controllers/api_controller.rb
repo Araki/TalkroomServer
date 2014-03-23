@@ -436,7 +436,7 @@ class ApiController < ApplicationController
             ).
             where(messages[:sendfrom_list_id].eq(params[:sendfrom]).or(messages[:sendfrom_list_id].eq(params[:sendto]))).
             where(messages[:sendto_list_id].eq(params[:sendfrom]).or(messages[:sendto_list_id].eq(params[:sendto]))).
-            order(messages[:id].asc).
+            order(messages[:id].desc).
             take(10)
             
     sql = query.to_sql

@@ -619,7 +619,12 @@ class ApiController < ApplicationController
         :sendfrom_image => @sendfrom_image,
         :sendto_list_id => @message.sendto_list_id,
         :room_id => @message.room_id,
-        :body => @message.body
+        :body => @message.body,
+        :year => sprintf('%04d', @message.created_at.year),
+        :month => sprintf('%02d', @message.created_at.month),
+        :day => sprintf('%02d', @message.created_at.day),
+        :hour => sprintf('%02d', @message.created_at.hour),
+        :min => sprintf('%02d', @message.created_at.min)
        })
         
         format.json { render :json => val, :status => 200 }

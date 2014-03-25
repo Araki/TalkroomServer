@@ -5,7 +5,7 @@
   	<th>ID</th>
     <th>入会経路</th>
     <th>UID</th>
-    <th>FB Name</th>
+    <th>性別</th>
     <th>メールアドレス</th>
     <th>アイコンURL</th>
     <th></th>
@@ -18,7 +18,7 @@
   	<td><%= list.id %></td>
     <td><%= list.channel %></td>
     <td><%= list.fb_uid %></td>
-    <td><%= list.fb_name %></td>
+    <td><%= list.gender %></td>
     <td><%= truncate(list.email, { :length => 20 }) %></td>
     <td><%= truncate(list.profile_image1, { :length => 20 })  %></td>
     <td><%= link_to 'Show', list %></td>

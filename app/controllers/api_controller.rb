@@ -2,7 +2,9 @@ class ApiController < ApplicationController
   
   #before_filter :check_logined
   
+  #================================================================
   #のぞくボタンのトップ画面
+  #================================================================
   def get_recent_rooms
     #<抽出条件>
     #(1)rooms.publicがTRUEである
@@ -95,12 +97,13 @@ class ApiController < ApplicationController
   
   
   
-  
+  #================================================================
   #「年代」「エリア」「目的」から検索し、結果を返すAPI
   #受け取るクエリ
   #年代：age
   #エリア：area
   #目的：purpose
+  #================================================================
   def get_search_users
     
     lists = Arel::Table.new(:lists, :as => 'rooms')
@@ -166,10 +169,11 @@ class ApiController < ApplicationController
   
   
   
-  
+  #================================================================
   #トーク画面のアタック中のリスト結果を返すAPI
   #受け取るクエリ
   #ユーザーID：user_id
+  #================================================================
   def get_oneside_rooms
     #（１）USERがメッセージを送った相手全員のIDを取得
     sql1 = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE R.id = M.room_id AND M.sendfrom_list_id = ' + params[:user_id] + ' GROUP BY M.sendto_list_id ORDER BY R.updated_at DESC;'
@@ -217,10 +221,11 @@ class ApiController < ApplicationController
   
   
   
-  
+  #================================================================
   #トーク画面のトーク中のリスト結果を返すAPI
   #受け取るクエリ
   #ユーザーID：user_id
+  #================================================================
   def get_bothside_rooms
 
     rooms = Arel::Table.new(:rooms, :as => 'rooms')#Arel::Table.new(:rooms)
@@ -284,10 +289,11 @@ class ApiController < ApplicationController
   
   
   
-  
+  #================================================================
   #あるユーザーの詳細画面
   #受け取るクエリ
   #ユーザーID：user_id
+  #================================================================
   def get_detail_profile
     result = List.
              where('id = ?', params[:user_id]).
@@ -340,10 +346,11 @@ class ApiController < ApplicationController
   
   
   
-  
+  #================================================================
   #あるユーザーのルームリストを返す
   #受け取るクエリ
   #ユーザーID：user_id
+  #================================================================
   def get_user_rooms
     
     rooms = Arel::Table.new(:rooms, :as => 'rooms')
@@ -411,10 +418,14 @@ class ApiController < ApplicationController
     
     
     
+    
+    
+  #================================================================
   #sendfromIDとsendtoIDからroomIDとメッセージのハッシュ配列を降順に取得
   #受け取るクエリ
   #送信者ID：sendfrom
   #受信者ID：sendto
+  #================================================================
   def get_room_message
     sendto_lists = Arel::Table.new(:lists, :as => 'sendto_lists')
     sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')
@@ -482,8 +493,9 @@ class ApiController < ApplicationController
     
     
     
-  
-  
+  #================================================================
+  #その他の一言の内容を更新
+  #================================================================
   def update_profile
 
     id = params[:user_id]
@@ -507,6 +519,13 @@ class ApiController < ApplicationController
   
   
   
+  
+  
+  
+  
+  #================================================================
+  #その他のプロフィール編集の内容を更新
+  #================================================================
   
   def update_detail_profile
      
@@ -545,14 +564,15 @@ class ApiController < ApplicationController
   end
   
   
-  #sendto_list_id
-  #sendfrom_list_id
-  #body
   
-  #sendtoとsendfromでメッセージを検索
-  #もしレコードがあった場合、そのレコードのroom_idでレコードを登録
-  #もしレコードがなかった場合、roomsでルームを作り、そのroom_idでレコードを作る
-  def creat_message
+  
+  
+  
+  
+ #================================================================
+ #トークで送信されたメッセージを登録
+ #================================================================
+  def create_message
 
     logger.info("Message===========")
     logger.info(params[:body])
@@ -637,7 +657,76 @@ class ApiController < ApplicationController
   
   
   
+  
+  
+  #================================================================
+  #アカウントを作成
+  #================================================================
+  def create_account
+
+    logger.info("===========Create Account===========")
+    logger.info(params[:channel])
+    logger.info(params[:fb_uid])
+    logger.info(params[:nickname])
+    logger.info(params[:gender])
+    logger.info(params[:email])
+    logger.info(params[:age])
+    logger.info(params[:purpose])
+    logger.info(params[:area])
+    logger.info(params[:profile_image1])
+    logger.info(params[:profile])
+    logger.info(params[:point])
+      
+    @list = List.new
+    @list.channel = params[:channel]
+    @list.fb_uid = params[:fb_uid]
+    @list.nickname = params[:nickname]
+    @list.gender = params[:gender]
+    @list.email = params[:email]
+    @list.age = params[:age]
+    @list.purpose = params[:purpose]
+    @list.area = params[:area]
+    @list.profile_image1 = params[:profile_image1]
+    @list.profile = params[:profile]
+    @list.point = params[:point]
+    @list.last_logined = Time.now.utc
+    
+    
+    respond_to do |format|
+      if @list.save       
+        format.json { render :json => @list, :status => 200 }
+      else
+        format.json { render :json => @list.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+  
+  
+  
+  
+  
+  
+  #================================================================
+  #Facebookログインボタン押下された際に既に登録されているかチェック
+  #================================================================
+  def check_login
+    logger.info(params[:fb_uid])
+    
+    flag = List.where(:fb_uid => params[:fb_uid]).exists?
+    logger.info("存在するか？ :#{flag}")
+    
+    respond_to do |format|
+      format.json { render :json => flag }
+    end
+  end
+  
+  
+  
+  
+  
+  #================================================================
   #時間を「〜分前」に変換するメソッド
+  #================================================================
   def exchangeTime(time)
     #現在時刻の取得
     now = Time.now.utc

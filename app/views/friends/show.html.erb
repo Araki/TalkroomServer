@@ -1,0 +1,20 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>List:</b>
+  <%= @friend.list_id %>
+</p>
+
+<p>
+  <b>Fb uid:</b>
+  <%= @friend.fb_uid %>
+</p>
+
+<p>
+  <b>Fb gender:</b>
+  <%= @friend.fb_gender %>
+</p>
+
+
+<%= link_to 'Edit', edit_friend_path(@friend) %> |
+<%= link_to 'Back', friends_path %>

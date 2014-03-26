@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  list_id: 1
+  fb_uid: 1
+  fb_gender: MyString
+
+two:
+  list_id: 1
+  fb_uid: 1
+  fb_gender: MyString

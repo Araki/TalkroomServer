@@ -10,7 +10,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140325115227) do
+ActiveRecord::Schema.define(:version => 20140325141914) do
+
+  create_table "friends", :force => true do |t|
+    t.integer  "list_id"
+    t.integer  "fb_uid"
+    t.string   "fb_gender"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "lists", :force => true do |t|
     t.datetime "created_at",     :null => false

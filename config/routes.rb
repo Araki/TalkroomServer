@@ -1,4 +1,6 @@
 Talkroom::Application.routes.draw do
+  resources :friends
+
   resources :lists
   match "/get_recent_rooms" => "api#get_recent_rooms"
   match "/get_search_users" => "api#get_search_users"
@@ -14,6 +16,7 @@ Talkroom::Application.routes.draw do
   
   match "/creat_message" => "api#creat_message"
   match "/create_account" => "api#create_account"
+  match "/create_friends" => "api#create_friends"
   
   match "/check_login" => "api#check_login"
   

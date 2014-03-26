@@ -691,7 +691,6 @@ class ApiController < ApplicationController
     @list.point = params[:point]
     @list.last_logined = Time.now.utc
     
-    
     respond_to do |format|
       if @list.save       
         format.json { render :json => @list, :status => 200 }
@@ -703,6 +702,28 @@ class ApiController < ApplicationController
   
   
   
+  
+  
+  
+=begin
+  #================================================================
+  #Facebookから取得したfriends Listを登録
+  #================================================================
+  def create_friends
+    #logger.info("パラメータの中身 :#{params[:friends_list]}")
+    
+    #@friend = Friend.new(params[:friend])
+    respond_to do |format|
+      if @friend.save
+        format.html { redirect_to @friend, :notice => 'Friend was successfully created.' }
+        format.json { render :json => @friend, :status => :created, :location => @friend }
+      else
+        format.html { render :action => "new" }
+        format.json { render :json => @friend.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+=end
   
   
   
@@ -769,5 +790,4 @@ class ApiController < ApplicationController
     end
   return timetext
   end
-  
 end

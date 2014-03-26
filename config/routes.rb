@@ -14,7 +14,7 @@ Talkroom::Application.routes.draw do
   match "/update_profile" => "api#update_profile"
   match "/update_detail_profile" => "api#update_detail_profile" 
   
-  match "/creat_message" => "api#creat_message"
+  match "/create_message" => "api#create_message"
   match "/create_account" => "api#create_account"
   match "/create_friends" => "api#create_friends"
   

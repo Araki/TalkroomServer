@@ -196,8 +196,9 @@ class ApiController < ApplicationController
     #ハッシュ配列を整形
     results.each do |result|
       nickname, profile_image, profile = nil
-      obj = List.select("nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
+      obj = List.select("id, nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
       val.push({
+        :sendto_id => obj["id"],
         :nickname => obj["nickname"], 
         :profile_image => obj["profile_image1"], 
         :profile => obj["profile"], 
@@ -265,8 +266,9 @@ class ApiController < ApplicationController
     #ハッシュ配列を整形
     results.each do |result|
       nickname, profile_image, profile = nil
-      obj = List.select("nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
+      obj = List.select("id, nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
       val.push({
+        :sendto_id => obj["id"],
         :nickname => obj["nickname"], 
         :profile_image => obj["profile_image1"], 
         :profile => obj["profile"], 
@@ -621,6 +623,9 @@ class ApiController < ApplicationController
       @message.sendto_list_id = params[:sendto_list_id]
       @message.room_id = @room.id
       @message.body = params[:body]
+      
+      sendfrom_profile_image = List.select(:profile_image1).where('id = ?', params[:sendfrom_list_id]).first
+      @sendfrom_image = sendfrom_profile_image["profile_image1"]
       
     else
       #レコードがある場合

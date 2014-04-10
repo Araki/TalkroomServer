@@ -14,5 +14,5 @@
 /log/*.log
 /tmp
 
-id_rsa_heroku
-id_rsa_heroku.pub
+/id_rsa_heroku
+/id_rsa_heroku.pub

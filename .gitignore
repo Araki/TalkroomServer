@@ -13,3 +13,6 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
+
+id_rsa_heroku
+id_rsa_heroku.pub

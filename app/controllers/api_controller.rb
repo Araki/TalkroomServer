@@ -596,7 +596,7 @@ class ApiController < ApplicationController
             ).
             where(messages[:sendfrom_list_id].eq(params[:sendfrom_list_id]).or(messages[:sendfrom_list_id].eq(params[:sendto_list_id]))).
             where(messages[:sendto_list_id].eq(params[:sendfrom_list_id]).or(messages[:sendto_list_id].eq(params[:sendto_list_id]))).
-            order(messages[:id].asc).
+            order(messages[:id].desc).
             take(1)
             
     sql = query.to_sql
@@ -624,6 +624,7 @@ class ApiController < ApplicationController
       @message.room_id = @room.id
       @message.body = params[:body]
       
+      @room_number = @room.id
       sendfrom_profile_image = List.select(:profile_image1).where('id = ?', params[:sendfrom_list_id]).first
       @sendfrom_image = sendfrom_profile_image["profile_image1"]
       
@@ -635,6 +636,9 @@ class ApiController < ApplicationController
       @message.sendto_list_id = params[:sendto_list_id]
       @message.room_id = @room_number
       @message.body = params[:body]
+      
+      room = Room.find(@room_number)
+      room.update_attribute(:updated_at, Time.now.utc)
     end
     
     respond_to do |format|

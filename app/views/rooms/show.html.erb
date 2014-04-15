@@ -10,6 +10,15 @@
   <%= @room.message_number %>
 </p>
 
+<p>
+  <b>created_at:</b>
+  <%= @room.created_at %>
+</p>
+
+<p>
+  <b>updated_at:</b>
+  <%= @room.updated_at %>
+</p>
 
 <%= link_to 'Edit', edit_room_path(@room) %> |
 <%= link_to 'Back', rooms_path %>

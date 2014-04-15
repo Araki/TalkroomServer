@@ -1,6 +1,36 @@
 class ApiController < ApplicationController
   
   #before_filter :check_logined
+  #================================================================
+  #登録されているユーザーを取得する（デバッグ用）
+  #================================================================
+  def get_all_users
+    lists = Arel::Table.new(:lists, :as => 'sendto_lists')
+    
+    query = lists.
+            project(lists[:id],lists[:nickname])
+                
+    sql = query.to_sql
+    logger.info(sql)
+
+    results = ActiveRecord::Base.connection.select(sql)
+    
+    val = []
+    
+    #ハッシュ配列を整形
+    results.each do |result|
+      val.push({
+        :id => result["id"],
+        :nickname => result["nickname"]
+      })
+    end
+    
+    respond_to do |format|
+      format.json { render :json => val }
+    end
+  end
+  
+  
   
   #================================================================
   #のぞくボタンのトップ画面

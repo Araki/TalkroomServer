@@ -613,16 +613,16 @@ class ApiController < ApplicationController
     logger.info(params[:sendfrom_list_id])
     
     messages = Arel::Table.new(:messages, :as => 'messages')
-    sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')
+    #sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')
     
     query = messages.
-            join(sendfrom_lists).
-            on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id])).
+            #join(sendfrom_lists).
+            #on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id])).
             project(messages[:id],
                     messages[:room_id],
                     messages[:sendfrom_list_id],
-                    sendfrom_lists[:profile_image1].as('sendfrom_image'),
-                    messages[:sendto_list_id]
+                    #sendfrom_lists[:profile_image1].as('sendfrom_image'),
+                    messages[:sendto_list_id]                    
             ).
             where(messages[:sendfrom_list_id].eq(params[:sendfrom_list_id]).or(messages[:sendfrom_list_id].eq(params[:sendto_list_id]))).
             where(messages[:sendto_list_id].eq(params[:sendfrom_list_id]).or(messages[:sendto_list_id].eq(params[:sendto_list_id]))).
@@ -633,15 +633,9 @@ class ApiController < ApplicationController
     logger.info("============================")
     logger.info(sql)
     
-    results = ActiveRecord::Base.connection.select(sql)
+    result = ActiveRecord::Base.connection.select(sql)
     
-    results.each do |result|
-        @room_number = result["room_id"]
-        @sendfrom_image = result["sendfrom_image"]
-    end
-    
-    
-    if results.count < 1 then
+    if result.count < 1 then
       #レコードが一つもないので、新しくroomsモデルにroomを作成
       @room = Room.new
       @room.public = TRUE
@@ -664,10 +658,22 @@ class ApiController < ApplicationController
       @message = Message.new
       @message.sendfrom_list_id = params[:sendfrom_list_id]
       @message.sendto_list_id = params[:sendto_list_id]
-      @message.room_id = @room_number
+      @message.room_id = result[0]["room_id"]
       @message.body = params[:body]
       
-      room = Room.find(@room_number)
+      #logger.info("params[:sendfrom_list_id]:#{params[:sendfrom_list_id]}")
+      #logger.info("result[0]['sendfrom_list_id']:#{result[0]['sendfrom_list_id']}")
+      if result[0]["sendfrom_list_id"] == params[:sendfrom_list_id].to_i then
+        obj = List.find(result[0]["sendfrom_list_id"])
+      else
+        #resultsはルームの最後のメッセージなので、相手が最後にメッセージを送ったときの場合
+        obj = List.find(result[0]["sendto_list_id"])
+      end
+      @sendfrom_image = obj["profile_image1"]
+      #logger.info("@sendfrom_image:#{@sendfrom_image}")
+      #logger.info("obj['profile_image1']:#{obj['profile_image1']}")
+      
+      room = Room.find(result[0]["room_id"])
       room.update_attribute(:updated_at, Time.now.utc)
     end
     

@@ -4,6 +4,7 @@ Talkroom::Application.routes.draw do
   resources :lists
   match "/get_all_users" => "api#get_all_users"#デバッグ用
   match "/get_recent_rooms" => "api#get_recent_rooms"
+  match "/get_room_summary_data" => "api#get_room_summary_data"
   match "/get_search_users" => "api#get_search_users"
   match "/get_oneside_rooms" => "api#get_oneside_rooms"
   match "/get_bothside_rooms" => "api#get_bothside_rooms"

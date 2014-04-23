@@ -41,75 +41,25 @@ class ApiController < ApplicationController
     #(2)messages.room_id = rooms.idであること
     #(3)updated_atでDESCにソート
     #(4)rooms.idもしくはmessages.room_idが重複しないもの
-    
-    sendto_lists = Arel::Table.new(:lists, :as => 'sendto_lists')
-    sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')
+
     rooms = Arel::Table.new(:rooms, :as => 'rooms')
-    messages = Arel::Table.new(:messages, :as => 'messages')
-    
-    recent_unique_messages = messages.
-                             project(messages[:id]).
-                             group(messages[:room_id]).
-                             order(messages[:id].desc)
-   logger.info("+++++++++++++++++++++++++++")
-   logger.info(recent_unique_messages.to_sql)
- 
-                  
     query = rooms.
-            join(messages).
-            on(messages[:room_id].eq(rooms[:id])).
-            join(sendfrom_lists).
-            on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id])).
-            join(sendto_lists).
-            on(messages[:sendto_list_id].eq(sendto_lists[:id])).
-            project(rooms[:id], 
-                    rooms[:public], 
-                    rooms[:updated_at], 
-                    messages[:room_id], 
-                    sendfrom_lists[:id].as('sendfrom_id'), 
-                    sendfrom_lists[:profile_image1].as('sendfrom_image'), 
-                    sendto_lists[:id].as('sendto_id'),
-                    sendto_lists[:profile_image1].as('sendto_image'), 
-                    messages[:body]
+            project(rooms[:id],
+                    rooms[:public],
+                    rooms[:updated_at]
                     ).
             where(rooms[:public].eq(TRUE)).
-            where(messages[:id].in(recent_unique_messages)).
-            group(messages[:room_id]).
             order(rooms[:updated_at].desc).
-            take(10)
-                
-                 
-    
+            take(100)
     sql = query.to_sql
     logger.info(sql)
-
     results = ActiveRecord::Base.connection.select(sql) 
-    
-
+   
     val = []
-
     results.each do |result|
- 
-      logger.info(result)
-      obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_id"]).order('id DESC').first
-      #もし相手がメッセージ未返信だった場合を想定
-      if obj3 then
-        sendto_message = obj3["body"]
-      else
-        sendto_message = ""
-      end
-      
-      updatedtime = exchangeTime(result["updated_at"].to_time)
-      
       val.push({
-        :room_id => result["room_id"], 
-        :updated_at => updatedtime,
-        :sendfrom_id => result["sendfrom_id"],
-        :sendfrom_image => result["sendfrom_image"],
-        :sendfrom_message => result["body"], 
-        :sendto_id => result["sendto_id"],
-        :sendto_image => result["sendto_image"],
-        :sendto_message => sendto_message
+        :room_id => result["id"], 
+        :updated_at => exchangeTime(result["updated_at"].to_time)
       })
     end
 
@@ -121,7 +71,124 @@ class ApiController < ApplicationController
   
   
   
+ 
+ 
+ 
+   #================================================================
+  #テーブルのルームサマリー情報を取得する
+  #================================================================
+  def get_room_summary_data
+  #<抽出条件>
+  #ルームIDを最大10件受取り、以下の情報を返す
+  #sendfromID
+  #sendtoID
+  #sendfromImage
+  #sendtoImage
+  #sendfromMessage
+  #sendtoMessage
   
+  #logger.info("params[room_ids]:#{params[:room_ids]}")
+  #logger.info("セパレート:#{params[:room_ids].split(",")}")
+  roomAry = params[:room_ids].split(",")
+  for room in roomAry do
+    logger.info("ROOM:#{room}")
+  end
+  
+  rooms = Arel::Table.new(:rooms, :as => 'rooms')
+  male_messages = Arel::Table.new(:messages, :as => 'male_messages')
+  female_messages = Arel::Table.new(:messages, :as => 'female_messages')
+  male_lists = Arel::Table.new(:lists, :as => 'male_lists')
+  female_lists = Arel::Table.new(:lists, :as => 'female_lists')
+  
+  query = rooms.
+          join(male_messages, Arel::Nodes::OuterJoin).
+          on(rooms[:male_last_message].eq(male_messages[:id])).
+          join(female_messages, Arel::Nodes::OuterJoin).
+          on(rooms[:female_last_message].eq(female_messages[:id])).
+          join(male_lists, Arel::Nodes::OuterJoin).
+          on(rooms[:male_id].eq(male_lists[:id])).
+          join(female_lists, Arel::Nodes::OuterJoin).
+          on(rooms[:female_id].eq(female_lists[:id])).
+          project(rooms[:id],
+                  rooms[:public],
+                  rooms[:updated_at],
+                  male_lists[:id].as('sendfrom_id'),
+                  male_lists[:profile_image1].as('sendfrom_image'),
+                  male_messages[:body].as('sendfrom_message'),
+                  female_lists[:id].as('sendto_id'),
+                  female_lists[:profile_image1].as('sendto_image'),
+                  female_messages[:body].as('sendto_message')
+                  ).
+          where(rooms[:id].in(roomAry)).
+          order(rooms[:updated_at].desc)
+                  
+=begin 
+    sendto_lists = Arel::Table.new(:lists, :as => 'sendto_lists')
+    sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')
+    messages = Arel::Table.new(:messages, :as => 'messages')
+    
+    query = messages.
+            join(sendfrom_lists).
+            on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id])).
+            join(sendto_lists).
+            on(messages[:sendto_list_id].eq(sendto_lists[:id])).
+            project(rooms[:id], 
+                    rooms[:public],
+                    rooms[:updated_at],
+                    sendfrom_lists[:id].as('sendfrom_id'), 
+                    sendfrom_lists[:profile_image1].as('sendfrom_image'), 
+                    sendto_lists[:id].as('sendto_id'),
+                    sendto_lists[:profile_image1].as('sendto_image'), 
+                    messages[:body]
+                    ).
+            where(rooms[:public].eq(TRUE)).
+            where(messages[:id].in(recent_unique_messages)).
+            group(messages[:room_id]).
+            order(rooms[:updated_at].desc).
+            take(10)
+=end             
+                 
+    
+    sql = query.to_sql
+    logger.info(sql)
+
+    results = ActiveRecord::Base.connection.select(sql) 
+    
+
+    val = []
+
+    results.each do |result|
+      logger.info(result)
+=begin
+      obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_id"]).order('id DESC').first
+      #もし相手がメッセージ未返信だった場合を想定
+      if obj3 then
+        sendto_message = obj3["body"]
+      else
+        sendto_message = ""
+      end
+=end
+      updatedtime = exchangeTime(result["updated_at"].to_time)
+      
+      val.push({
+        :room_id => result["id"], 
+        :public => result["public"],
+        :updated_at => updatedtime,
+        :sendfrom_id => result["sendfrom_id"],
+        :sendfrom_image => result["sendfrom_image"],
+        :sendfrom_message => result["sendfrom_message"], 
+        :sendto_id => result["sendto_id"],
+        :sendto_image => result["sendto_image"],
+        :sendto_message => result["sendto_message"]
+      })
+    end
+
+    respond_to do |format|
+      format.json { render :json => val }
+    end
+  end
+  
+   
   
   
   
@@ -133,12 +200,16 @@ class ApiController < ApplicationController
   #年代：age
   #エリア：area
   #目的：purpose
+  #自分のユーザーID：user_id
   #================================================================
   def get_search_users
     
     lists = Arel::Table.new(:lists, :as => 'rooms')
     rooms = Arel::Table.new(:rooms, :as => 'rooms')
     
+    access_user = List.find(params[:user_id], :select => "gender")
+    logger.info("GENDER: #{access_user.gender}")
+        
     query = lists.
             project(lists[:id],
                     lists[:nickname],
@@ -159,6 +230,13 @@ class ApiController < ApplicationController
     end
     if params[:purpose] != "" then
       query = query.where(lists[:purpose].eq(params[:purpose]))
+    end
+    if access_user.gender == "male" then
+      query = query.where(lists[:gender].not_eq(access_user.gender))
+      #logger.info("##########MALE")
+    elsif access_user.gender == "female" then
+      query = query.where(lists[:gender].not_eq(access_user.gender))
+      #logger.info("##########FEMALE")
     end
             
     sql = query.to_sql
@@ -193,6 +271,8 @@ class ApiController < ApplicationController
   end
   
   
+  
+
   
   
   
@@ -382,6 +462,7 @@ class ApiController < ApplicationController
   #あるユーザーのルームリストを返す
   #受け取るクエリ
   #ユーザーID：user_id
+  #ログインユーザーID：login_user_id
   #================================================================
   def get_user_rooms
     
@@ -401,6 +482,7 @@ class ApiController < ApplicationController
             ).
             where(rooms[:public].eq(TRUE)).
             where(messages[:sendfrom_list_id].eq(params[:user_id]).or(messages[:sendto_list_id].eq(params[:user_id]))).
+            where(messages[:sendfrom_list_id].not_eq(params[:login_user_id]).and(messages[:sendto_list_id].not_eq(params[:login_user_id]))).
             group(messages[:room_id]).
             order(rooms[:updated_at].desc).
             take(10)
@@ -634,12 +716,22 @@ class ApiController < ApplicationController
     logger.info(sql)
     
     result = ActiveRecord::Base.connection.select(sql)
-    
+    sender = List.find(params[:sendfrom_list_id], :select => "gender")
+
+
     if result.count < 1 then
+      
       #レコードが一つもないので、新しくroomsモデルにroomを作成
       @room = Room.new
       @room.public = TRUE
-      @room.message_number = 1
+      @room.message_number = 0
+      if sender.gender == "male" then
+        @room.male_id = params[:sendfrom_list_id]
+        @room.female_id = params[:sendto_list_id]
+      else
+        @room.male_id = params[:sendto_list_id]
+        @room.female_id = params[:sendfrom_list_id]
+      end
       @room.save
       
       @message = Message.new
@@ -648,10 +740,10 @@ class ApiController < ApplicationController
       @message.room_id = @room.id
       @message.body = params[:body]
       
-      @room_number = @room.id
+      #@room_number = @room.id
       sendfrom_profile_image = List.select(:profile_image1).where('id = ?', params[:sendfrom_list_id]).first
       @sendfrom_image = sendfrom_profile_image["profile_image1"]
-      
+       
     else
       #レコードがある場合
       
@@ -673,12 +765,30 @@ class ApiController < ApplicationController
       #logger.info("@sendfrom_image:#{@sendfrom_image}")
       #logger.info("obj['profile_image1']:#{obj['profile_image1']}")
       
-      room = Room.find(result[0]["room_id"])
-      room.update_attribute(:updated_at, Time.now.utc)
     end
     
     respond_to do |format|
       if @message.save
+        if result.count < 1 then
+          if sender.gender == "male" then
+            logger.info("MESSAGE ID: #{@message.id}")
+            @room.update_attributes(:male_last_message => @message.id, :updated_at => Time.now.utc, :message_number => @room.message_number + 1)
+          elsif sender.gender == "female" then
+            logger.info("MESSAGE ID: #{@message.id}")
+            @room.update_attributes(:female_last_message => @message.id, :updated_at => Time.now.utc, :message_number => @room.message_number + 1)
+          end
+        else
+          room = Room.find(result[0]["room_id"])
+          if sender.gender == "male" then
+            logger.info("MESSAGE ID: #{@message.id}")
+            room.update_attributes(:male_last_message => @message.id, :updated_at => Time.now.utc, :message_number => room.message_number + 1)
+          elsif sender.gender == "female" then
+            logger.info("MESSAGE ID: #{@message.id}")
+            room.update_attributes(:female_last_message => @message.id, :updated_at => Time.now.utc, :message_number => room.message_number + 1)
+          end
+        end
+        
+        
         val = []
         val.push({
         :sendfrom_list_id => @message.sendfrom_list_id,

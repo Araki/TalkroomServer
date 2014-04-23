@@ -3,8 +3,13 @@
 <table>
   <tr>
   	<th>ID</th>
-    <th>Public</th>
-    <th>Message number</th>
+    <th>公開</th>
+    <th>男性ID</th>
+    <th>女性ID</th>
+    <th>男性ラストメッセージ</th>
+    <th>女性ラストメッセージ</th>
+    <th>メッセージ数</th>
+    <th>更新日時</th>
     <th></th>
     <th></th>
     <th></th>
@@ -14,7 +19,12 @@
   <tr>
   	<td><%= room.id %></td>
     <td><%= room.public %></td>
+    <td><%= room.male_id %></td>
+    <td><%= room.female_id %></td>
+    <td><%= room.male_last_message %></td>
+    <td><%= room.female_last_message %></td>
     <td><%= room.message_number %></td>
+    <td><%= room.updated_at %></td>
     <td><%= link_to 'Show', room %></td>
     <td><%= link_to 'Edit', edit_room_path(room) %></td>
     <td><%= link_to 'Destroy', room, :method => :delete, :data => { :confirm => 'Are you sure?' } %></td>

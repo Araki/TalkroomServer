@@ -120,34 +120,7 @@ class ApiController < ApplicationController
                   female_messages[:body].as('sendto_message')
                   ).
           where(rooms[:id].in(roomAry)).
-          order(rooms[:updated_at].desc)
-                  
-=begin 
-    sendto_lists = Arel::Table.new(:lists, :as => 'sendto_lists')
-    sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')
-    messages = Arel::Table.new(:messages, :as => 'messages')
-    
-    query = messages.
-            join(sendfrom_lists).
-            on(messages[:sendfrom_list_id].eq(sendfrom_lists[:id])).
-            join(sendto_lists).
-            on(messages[:sendto_list_id].eq(sendto_lists[:id])).
-            project(rooms[:id], 
-                    rooms[:public],
-                    rooms[:updated_at],
-                    sendfrom_lists[:id].as('sendfrom_id'), 
-                    sendfrom_lists[:profile_image1].as('sendfrom_image'), 
-                    sendto_lists[:id].as('sendto_id'),
-                    sendto_lists[:profile_image1].as('sendto_image'), 
-                    messages[:body]
-                    ).
-            where(rooms[:public].eq(TRUE)).
-            where(messages[:id].in(recent_unique_messages)).
-            group(messages[:room_id]).
-            order(rooms[:updated_at].desc).
-            take(10)
-=end             
-                 
+          order(rooms[:updated_at].desc)  
     
     sql = query.to_sql
     logger.info(sql)
@@ -159,15 +132,7 @@ class ApiController < ApplicationController
 
     results.each do |result|
       logger.info(result)
-=begin
-      obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_id"]).order('id DESC').first
-      #もし相手がメッセージ未返信だった場合を想定
-      if obj3 then
-        sendto_message = obj3["body"]
-      else
-        sendto_message = ""
-      end
-=end
+
       updatedtime = exchangeTime(result["updated_at"].to_time)
       
       val.push({
@@ -467,8 +432,35 @@ class ApiController < ApplicationController
   def get_user_rooms
     
     rooms = Arel::Table.new(:rooms, :as => 'rooms')
-    messages = Arel::Table.new(:messages, :as => 'messages')
+    male_messages = Arel::Table.new(:messages, :as => 'male_messages')
+    female_messages = Arel::Table.new(:messages, :as => 'female_messages')
+    male_lists = Arel::Table.new(:lists, :as => 'male_lists')
+    female_lists = Arel::Table.new(:lists, :as => 'female_lists')
     
+    query = rooms.
+            join(male_messages, Arel::Nodes::OuterJoin).
+            on(rooms[:male_last_message].eq(male_messages[:id])).
+            join(female_messages, Arel::Nodes::OuterJoin).
+            on(rooms[:female_last_message].eq(female_messages[:id])).
+            join(male_lists, Arel::Nodes::OuterJoin).
+            on(rooms[:male_id].eq(male_lists[:id])).
+            join(female_lists, Arel::Nodes::OuterJoin).
+            on(rooms[:female_id].eq(female_lists[:id])).
+            project(rooms[:id],
+                    rooms[:public],
+                    rooms[:updated_at],
+                    male_lists[:id].as('sendfrom_id'),
+                    male_lists[:profile_image1].as('sendfrom_image'),
+                    male_messages[:body].as('sendfrom_message'),
+                    female_lists[:id].as('sendto_id'),
+                    female_lists[:profile_image1].as('sendto_image'),
+                    female_messages[:body].as('sendto_message')
+                    ).
+            where(male_lists[:id].eq(params[:user_id]).or(female_lists[:id].eq(params[:user_id]))).
+            where(male_lists[:id].not_eq(params[:login_user_id]).and(female_lists[:id].not_eq(params[:login_user_id]))).
+            order(rooms[:updated_at].desc)  
+    
+=begin
     query = rooms.
             join(messages).
             on(messages[:room_id].eq(rooms[:id])).
@@ -486,18 +478,18 @@ class ApiController < ApplicationController
             group(messages[:room_id]).
             order(rooms[:updated_at].desc).
             take(10)
+=end
             
     sql = query.to_sql
     logger.info("============================")
     logger.info(sql)
-    
-    #sql = 'SELECT MIN(R.id), R.public, R.updated_at, M.room_id, M.sendfrom_list_id, M.sendto_list_id, M.body FROM rooms AS R, messages AS M WHERE R.public = "t" AND M.room_id = R.id AND ( M.sendfrom_list_id = ' + params[:user_id] + ' OR M.sendto_list_id = ' + params[:user_id] + ' ) GROUP BY M.room_id ORDER BY R.updated_at DESC LIMIT 10;'
     results = ActiveRecord::Base.connection.select(sql)
     
     val = []
     
     #ハッシュ配列を整形
     results.each do |result|
+=begin
       sendfrom_image, sendto_image, sendto_message = nil
       obj1 = List.select(:profile_image1).where('id = ?', result["sendfrom_list_id"]).first
       sendfrom_image = obj1["profile_image1"]
@@ -518,9 +510,21 @@ class ApiController < ApplicationController
         :updated_at => updatedtime, #result["updated_at"], 
         :sendfrom_id => result["sendfrom_list_id"],
         :sendfrom_image => sendfrom_image, 
-        :sendfrom_message => result["body"], 
+        :sendfrom_message => result["body"],
+        :sendto_id => result["sendto_list_id"], 
         :sendto_image => sendto_image, 
         :sendto_message => sendto_message
+      })
+=end
+      val.push({
+        :room_id => result["room_id"], 
+        :updated_at => exchangeTime(result["updated_at"].to_time),
+        :sendfrom_id => result["sendfrom_id"],
+        :sendfrom_image => result["sendfrom_image"], 
+        :sendfrom_message => result["sendfrom_message"],
+        :sendto_id => result["sendto_id"], 
+        :sendto_image => result["sendto_image"], 
+        :sendto_message => result["sendto_message"]
       })
     end
     

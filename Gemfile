@@ -11,6 +11,7 @@ group :development do
 end
 #gem 'pg', groups: %w(production), require:false
 
+gem 'devise'
 gem 'omniauth'
 gem 'omniauth-facebook'
 

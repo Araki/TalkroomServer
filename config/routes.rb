@@ -1,4 +1,6 @@
 Talkroom::Application.routes.draw do
+
+
   resources :friends
 
   resources :lists
@@ -28,13 +30,23 @@ Talkroom::Application.routes.draw do
 
   resources :messages
 
-  get "sessions/callback"
-  get "welcome/index"
-  match "/auth/:provider/callback" => "sessions#callback"  
-  match "/logout" => "sessions#destroy", :as => :logout  
-  root :to => 'welcome#index'  
+  #get "sessions/callback"
+  #get "welcome/index"
+  
+  #match "/auth/:provider/callback" => "sessions#callback"  
+  #match "/logout" => "sessions#destroy", :as => :logout  
+  
+  root :to => 'welcome#index' 
   get 'lists', :to=> 'lists#index', :as=>:user_root
 
+  devise_for :lists, :controllers => { :omniauth_callbacks => "lists/omniauth_callbacks" }
+  
+  devise_scope :list do
+    get 'sign_in.list', :to => 'devise/sessions#new', :as => :new_user_session
+    get 'sign_in', :to => 'devise/sessions#new', :as => :new_session
+    get 'sign_out', :to => 'devise/sessions#destroy', :as => :destroy_user_session
+  end
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

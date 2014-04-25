@@ -10,7 +10,7 @@
   %>
 </head>
 <body>  
-  <div>  
+  <div> 
   <% if current_omniuser %>
   	<%= image_tag current_omniuser.profile_image1 %><br />
   	<%= label_tag "メールアドレス： " + current_omniuser.email %><br />
@@ -21,6 +21,15 @@
     <%= link_to "facebookでlogin", "/auth/facebook" %>
   <% end %>
   </div>
+  
+  <ul class="nav">
+  <% if list_signed_in? %>
+    <li><%= link_to 'ログアウト', destroy_user_session_path %></li>
+  <% else %>
+    <li><%= link_to "facebookでログイン", list_omniauth_authorize_path(:facebook) %></li>
+  <% end %>
+
+</ul>
   <%= yield %>  
 <⁄body>
 </html>

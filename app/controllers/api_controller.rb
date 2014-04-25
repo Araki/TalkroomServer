@@ -459,26 +459,6 @@ class ApiController < ApplicationController
             where(male_lists[:id].eq(params[:user_id]).or(female_lists[:id].eq(params[:user_id]))).
             where(male_lists[:id].not_eq(params[:login_user_id]).and(female_lists[:id].not_eq(params[:login_user_id]))).
             order(rooms[:updated_at].desc)  
-    
-=begin
-    query = rooms.
-            join(messages).
-            on(messages[:room_id].eq(rooms[:id])).
-            project(rooms[:id],
-                    rooms[:public],
-                    rooms[:updated_at],
-                    messages[:room_id],
-                    messages[:sendfrom_list_id],
-                    messages[:sendto_list_id],
-                    messages[:body]
-            ).
-            where(rooms[:public].eq(TRUE)).
-            where(messages[:sendfrom_list_id].eq(params[:user_id]).or(messages[:sendto_list_id].eq(params[:user_id]))).
-            where(messages[:sendfrom_list_id].not_eq(params[:login_user_id]).and(messages[:sendto_list_id].not_eq(params[:login_user_id]))).
-            group(messages[:room_id]).
-            order(rooms[:updated_at].desc).
-            take(10)
-=end
             
     sql = query.to_sql
     logger.info("============================")
@@ -489,33 +469,6 @@ class ApiController < ApplicationController
     
     #ハッシュ配列を整形
     results.each do |result|
-=begin
-      sendfrom_image, sendto_image, sendto_message = nil
-      obj1 = List.select(:profile_image1).where('id = ?', result["sendfrom_list_id"]).first
-      sendfrom_image = obj1["profile_image1"]
-      obj2 = List.select(:profile_image1).where('id = ?', result["sendto_list_id"]).first
-      sendto_image = obj2["profile_image1"]
-      obj3 = Message.select(:body).where('sendfrom_list_id = ?', result["sendto_list_id"]).order('id DESC').first
-      updatedtime = exchangeTime(result["updated_at"].to_time)
-      
-      #もし相手がメッセージ未返信だった場合を想定
-      if obj3 then
-        sendto_message = obj3["body"]
-      else
-        sendto_message = ""
-      end
-      
-      val.push({
-        :room_id => result["room_id"], 
-        :updated_at => updatedtime, #result["updated_at"], 
-        :sendfrom_id => result["sendfrom_list_id"],
-        :sendfrom_image => sendfrom_image, 
-        :sendfrom_message => result["body"],
-        :sendto_id => result["sendto_list_id"], 
-        :sendto_image => sendto_image, 
-        :sendto_message => sendto_message
-      })
-=end
       val.push({
         :room_id => result["room_id"], 
         :updated_at => exchangeTime(result["updated_at"].to_time),
@@ -533,6 +486,10 @@ class ApiController < ApplicationController
     end
   end
   
+    
+    
+    
+    
     
     
     

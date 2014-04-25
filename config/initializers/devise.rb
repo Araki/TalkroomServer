@@ -1,3 +1,5 @@
+require "omniauth-facebook"
+
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
@@ -253,4 +255,16 @@ Devise.setup do |config|
   # When using omniauth, Devise cannot automatically set Omniauth path,
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
+=begin 
+  config.omniauth( :facebook,
+                   ENV['129550470552082'],
+                   ENV['6a185210a3ad8524b0f54bb8b50eed5d'],
+                   {:scope => 'email'} )
+=end
+  
+  config.omniauth :facebook, '129550470552082', '6a185210a3ad8524b0f54bb8b50eed5d', :scope => 'email,user_birthday', :display => 'popup'
+  
+
+
+
 end

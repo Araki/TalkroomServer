@@ -1,5 +1,12 @@
 class List < ActiveRecord::Base
-  attr_accessible :channel, :fb_uid, :fb_name, :nickname, :email, :age, :purpose, :area, :profile_image1, :profile_image2, :profile_image3, :profile, :tall, :blood, :style, :holiday, :alcohol, :cigarette, :salary, :point, :last_logined, :gender
+  # Include default devise modules. Others available are:
+  # :confirmable, :lockable, :timeoutable and :omniauthable
+  #devise :database_authenticatable, :registerable,:recoverable, :rememberable, :trackable, :validatable, :omniauthable
+  devise :trackable, :omniauthable
+
+  # Setup accessible (or protected) attributes for your model
+  #attr_accessible :email, :password, :password_confirmation, :remember_me
+  attr_accessible :password, :channel, :fb_uid, :fb_name, :nickname, :email, :age, :purpose, :area, :profile_image1, :profile_image2, :profile_image3, :profile, :tall, :blood, :style, :holiday, :alcohol, :cigarette, :salary, :point, :last_logined, :gender
   
   #==========
   #アソシエーションの設定
@@ -82,4 +89,33 @@ class List < ActiveRecord::Base
       end
     end
   end
+  
+  #=====================
+  #新規
+  #=====================
+  def self.new_with_session(params, session)
+    super.tap do |user|
+      if data = session["devise.facebook_data"] && session["devise.facebook_data"]["extra"]["raw_info"]
+        user.email = data["email"]
+      end
+    end
+  end
+
+
+  def self.find_for_facebook_oauth(auth, signed_in_resource=nil)
+    user = List.where(:provider => auth.channel, :uid => auth.fb_uid).first
+    unless user
+      user = List.create(:nickname => auth.extra.raw_info.name,
+                         :channel => auth.provider,
+                         :fb_uid => auth.uid,
+ #                          email:auth.info.email, #emailを取得したい場合は、migrationにemailを追加してください。
+                         :password => Devise.friendly_token[0,20]
+                          )
+    end
+    user
+  end
+  
+  
+  
+  
 end

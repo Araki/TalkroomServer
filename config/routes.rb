@@ -24,6 +24,9 @@ Talkroom::Application.routes.draw do
   
   match "/check_login" => "api#check_login"
   
+  # トークン利用の例
+  match "/example_token" => "api#example_token"
+  
   resources :visits
 
   resources :rooms

@@ -1,5 +1,11 @@
 class ApiController < ApplicationController
   
+  # 認証フィルタ
+  #   認証が必要なAPIを only に追加すること
+  #   認証を終えると変数 @user にユーザ情報が格納されるため、各処理で利用できる
+  #   例) before_filter :check_app_token, :only => [:create_message, :create_friends]
+  before_filter :check_app_token, :only => [:example_token]
+  
   #before_filter :check_logined
   #================================================================
   #登録されているユーザーを取得する（デバッグ用）
@@ -808,6 +814,17 @@ class ApiController < ApplicationController
     @list.point = params[:point]
     @list.last_logined = Time.now.utc
     
+    # access_token チェック
+    if Digest::MD5.hexdigest(Digest::MD5.hexdigest(params[:fb_uid])) != params[:access_token] 
+      # 異なるときはエラー
+      format.json { render :json => {error: "Invalid Access Token", :status => 403 }}
+      return;
+    end
+    
+    # セキュリティ向上のためのトークンを生成
+    # （ここで生成された値をスマートフォン側に保存しておく必要あり）
+    @list.app_token = params[:fb_uid] + "-" + Digest::MD5.hexdigest(params[:fb_uid] + Time.now.to_s)
+    
     respond_to do |format|
       if @list.save       
         format.json { render :json => @list, :status => 200 }
@@ -846,15 +863,33 @@ class ApiController < ApplicationController
   
   #================================================================
   #Facebookログインボタン押下された際に既に登録されているかチェック
+  # すでに登録されているときは、認証用のapp_tokenを返却
   #================================================================
   def check_login
     logger.info(params[:fb_uid])
+    logger.info(params[:access_token])
     
     flag = List.where(:fb_uid => params[:fb_uid]).exists?
     logger.info("存在するか？ :#{flag}")
     
+    # access_token をチェック
+    # access_token 生成アルゴリズムをスマホ側と共有する必要あり
+    #   今回は fb_uid をシードに2回MD5関数をとったものとする
+    if( flag == true && Digest::MD5.hexdigest(Digest::MD5.hexdigest(params[:fb_uid])) == params[:access_token] )
+      logger.info("Check access token : Success")
+      
+      # ユーザ検索
+      user = List.find_by_fb_uid params[:fb_uid]
+      app_token = user.app_token
+      flag = "true"
+    else
+      logger.info("Check access token : Failure")
+      flag = "false"
+      app_token = nil 
+    end
+    
     respond_to do |format|
-      format.json { render :json => flag }
+      format.json { render :json => {result:flag, app_token: app_token} }
     end
   end
   
@@ -906,5 +941,27 @@ class ApiController < ApplicationController
       end
     end
   return timetext
+  end
+  
+  # app_token をもとに認証する
+  def check_app_token 
+    app_token = params[:app_token]
+    @user = List.find_by_app_token(app_token)
+
+    # app_token にひもづくユーザーが見つからなかったときはエラー
+    if @user == nil
+      respond_to do |format|
+        format.json { render :json => {error: 'Auth error'} }
+      end
+    end
+  end
+  
+  # token 利用の例
+  def example_token
+    # ここにきた時点ですでに before_filter の check_app_token をチェック済みのはず
+    # 認証されたユーザ情報は インスタンス変数 @user に格納されています
+    respond_to do |format|
+      format.json { render :json => {result: 'OK', user: @user }}
+    end
   end
 end

@@ -4,7 +4,7 @@ class ApiController < ApplicationController
   #   認証が必要なAPIを only に追加すること
   #   認証を終えると変数 @user にユーザ情報が格納されるため、各処理で利用できる
   #   例) before_filter :check_app_token, :only => [:create_message, :create_friends]
-  before_filter :check_app_token, :only => [:example_token]
+  before_filter :check_app_token, :only => [:example_token, :get_recent_rooms]
   
   #before_filter :check_logined
   #================================================================
@@ -817,7 +817,7 @@ class ApiController < ApplicationController
     # access_token チェック
     if Digest::MD5.hexdigest(Digest::MD5.hexdigest(params[:fb_uid])) != params[:access_token] 
       # 異なるときはエラー
-      format.json { render :json => {error: "Invalid Access Token", :status => 403 }}
+      format.json { render :json => {:error => "Invalid Access Token", :status => 403 }}
       return;
     end
     
@@ -889,7 +889,7 @@ class ApiController < ApplicationController
     end
     
     respond_to do |format|
-      format.json { render :json => {result:flag, app_token: app_token} }
+      format.json { render :json => {:result => flag, :app_token => app_token} }
     end
   end
   
@@ -951,7 +951,7 @@ class ApiController < ApplicationController
     # app_token にひもづくユーザーが見つからなかったときはエラー
     if @user == nil
       respond_to do |format|
-        format.json { render :json => {error: 'Auth error'} }
+        format.json { render :json => {:error => 'Auth error'} }
       end
     end
   end
@@ -961,7 +961,7 @@ class ApiController < ApplicationController
     # ここにきた時点ですでに before_filter の check_app_token をチェック済みのはず
     # 認証されたユーザ情報は インスタンス変数 @user に格納されています
     respond_to do |format|
-      format.json { render :json => {result: 'OK', user: @user }}
+      format.json { render :json => {:result => 'OK', :user => @user }}
     end
   end
 end

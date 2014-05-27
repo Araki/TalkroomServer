@@ -4,7 +4,7 @@ class ApiController < ApplicationController
   #   認証が必要なAPIを only に追加すること
   #   認証を終えると変数 @user にユーザ情報が格納されるため、各処理で利用できる
   #   例) before_filter :check_app_token, :only => [:create_message, :create_friends]
-  before_filter :check_app_token, :only => [:example_token]
+  before_filter :check_app_token, :only => [:example_token, :get_recent_rooms]
   
   #before_filter :check_logined
   #================================================================

@@ -4,7 +4,21 @@ class ApiController < ApplicationController
   #   認証が必要なAPIを only に追加すること
   #   認証を終えると変数 @user にユーザ情報が格納されるため、各処理で利用できる
   #   例) before_filter :check_app_token, :only => [:create_message, :create_friends]
-  before_filter :check_app_token, :only => [:example_token, :get_recent_rooms]
+  before_filter :check_app_token, :only => [:example_token,
+                                            :get_all_users,
+                                            :get_recent_rooms,
+                                            :get_room_summary_data,
+                                            :get_search_users,
+                                            :get_oneside_rooms,
+                                            :get_bothside_rooms,
+                                            :get_detail_profile,
+                                            :get_user_rooms,
+                                            :get_room_message,
+                                            :update_profile,
+                                            :update_detail_profile,
+                                            :create_message,
+                                            :create_account
+                                            ]
   
   #before_filter :check_logined
   #================================================================
@@ -178,7 +192,7 @@ class ApiController < ApplicationController
     lists = Arel::Table.new(:lists, :as => 'rooms')
     rooms = Arel::Table.new(:rooms, :as => 'rooms')
     
-    access_user = List.find(params[:user_id], :select => "gender")
+    access_user = List.find(@user.id, :select => "gender")
     logger.info("GENDER: #{access_user.gender}")
         
     query = lists.
@@ -257,10 +271,10 @@ class ApiController < ApplicationController
   #================================================================
   def get_oneside_rooms
     #（１）USERがメッセージを送った相手全員のIDを取得
-    sql1 = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE R.id = M.room_id AND M.sendfrom_list_id = ' + params[:user_id] + ' GROUP BY M.sendto_list_id ORDER BY R.updated_at DESC;'
+    sql1 = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE R.id = M.room_id AND M.sendfrom_list_id = ' + @user.id + ' GROUP BY M.sendto_list_id ORDER BY R.updated_at DESC;'
     results = ActiveRecord::Base.connection.select(sql1)
     #（２）双方向でメッセージを送りあった相手全員のIDを取得
-    sql2 = 'SELECT DISTINCT sendfrom_list_id FROM messages WHERE sendfrom_list_id IN ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + params[:user_id] + ') GROUP BY sendfrom_list_id;'
+    sql2 = 'SELECT DISTINCT sendfrom_list_id FROM messages WHERE sendfrom_list_id IN ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + @user.id + ') GROUP BY sendfrom_list_id;'
     mutual_send_users = ActiveRecord::Base.connection.select(sql2)
     
     val =[]
@@ -316,7 +330,7 @@ class ApiController < ApplicationController
     #このユーザーがメッセージを送った相手のユニークなルームIDリスト
     sendtoLists =  messages.
                    project(messages[:room_id]).
-                   where(messages[:sendto_list_id].eq(params[:user_id])).
+                   where(messages[:sendto_list_id].eq(@user.id)).
                    group(messages[:room_id]).
                    order(messages[:id].desc) 
 
@@ -331,7 +345,7 @@ class ApiController < ApplicationController
                     rooms[:updated_at]
             ).
             where(messages[:room_id].in(sendtoLists)).
-            where(messages[:sendfrom_list_id].eq(params[:user_id])).
+            where(messages[:sendfrom_list_id].eq(@user.id)).
             group(messages[:room_id]).
             order(messages[:id].desc)
             
@@ -379,7 +393,7 @@ class ApiController < ApplicationController
   #================================================================
   def get_detail_profile
     result = List.
-             where('id = ?', params[:user_id]).
+             where('id = ?', @user.id).
              select("id, 
                     nickname, 
                     profile_image1, 
@@ -463,7 +477,7 @@ class ApiController < ApplicationController
                     female_messages[:body].as('sendto_message')
                     ).
             where(male_lists[:id].eq(params[:user_id]).or(female_lists[:id].eq(params[:user_id]))).
-            where(male_lists[:id].not_eq(params[:login_user_id]).and(female_lists[:id].not_eq(params[:login_user_id]))).
+            where(male_lists[:id].not_eq(@user.id).and(female_lists[:id].not_eq(@user.id))).
             order(rooms[:updated_at].desc)  
             
     sql = query.to_sql
@@ -580,11 +594,11 @@ class ApiController < ApplicationController
   #================================================================
   def update_profile
 
-    id = params[:user_id]
+    id = @user.id
     profile = params[:profile]
      
     logger.info("ID===========")
-    logger.info(params[:user_id])
+    logger.info(@user.id)
     logger.info("Profile===========")
     logger.info(params[:profile])
     
@@ -611,7 +625,7 @@ class ApiController < ApplicationController
   
   def update_detail_profile
      
-    logger.info("ID:#{params[:user_id]}")
+    logger.info("ID:#{@user.id}")
     logger.info("NICKNAME:#{params[:nickname]}")
     logger.info("AGE:#{params[:age]}")
     logger.info("PURPOSE:#{params[:purpose]}")
@@ -624,7 +638,7 @@ class ApiController < ApplicationController
     logger.info("CIGARETTE:#{params[:cigarette]}")
     logger.info("SALARY:#{params[:salary]}")
 
-    @list = List.find(params[:user_id])
+    @list = List.find(@user.id)
   
     respond_to do |format|
       if @list.update_attributes(:nickname => params[:nickname],
@@ -659,7 +673,7 @@ class ApiController < ApplicationController
     logger.info("Message===========")
     logger.info(params[:body])
     logger.info(params[:sendto_list_id])
-    logger.info(params[:sendfrom_list_id])
+    logger.info(@user.id)
     
     messages = Arel::Table.new(:messages, :as => 'messages')
     #sendfrom_lists = Arel::Table.new(:lists, :as => 'sendfrom_lists')
@@ -673,8 +687,8 @@ class ApiController < ApplicationController
                     #sendfrom_lists[:profile_image1].as('sendfrom_image'),
                     messages[:sendto_list_id]                    
             ).
-            where(messages[:sendfrom_list_id].eq(params[:sendfrom_list_id]).or(messages[:sendfrom_list_id].eq(params[:sendto_list_id]))).
-            where(messages[:sendto_list_id].eq(params[:sendfrom_list_id]).or(messages[:sendto_list_id].eq(params[:sendto_list_id]))).
+            where(messages[:sendfrom_list_id].eq(@user.id).or(messages[:sendfrom_list_id].eq(params[:sendto_list_id]))).
+            where(messages[:sendto_list_id].eq(@user.id).or(messages[:sendto_list_id].eq(params[:sendto_list_id]))).
             order(messages[:id].desc).
             take(1)
             
@@ -683,7 +697,7 @@ class ApiController < ApplicationController
     logger.info(sql)
     
     result = ActiveRecord::Base.connection.select(sql)
-    sender = List.find(params[:sendfrom_list_id], :select => "gender")
+    sender = List.find(@user.id, :select => "gender")
 
 
     if result.count < 1 then
@@ -693,36 +707,36 @@ class ApiController < ApplicationController
       @room.public = TRUE
       @room.message_number = 0
       if sender.gender == "male" then
-        @room.male_id = params[:sendfrom_list_id]
+        @room.male_id = @user.id
         @room.female_id = params[:sendto_list_id]
       else
         @room.male_id = params[:sendto_list_id]
-        @room.female_id = params[:sendfrom_list_id]
+        @room.female_id = @user.id
       end
       @room.save
       
       @message = Message.new
-      @message.sendfrom_list_id = params[:sendfrom_list_id]
+      @message.sendfrom_list_id = @user.id
       @message.sendto_list_id = params[:sendto_list_id]
       @message.room_id = @room.id
       @message.body = params[:body]
       
       #@room_number = @room.id
-      sendfrom_profile_image = List.select(:profile_image1).where('id = ?', params[:sendfrom_list_id]).first
+      sendfrom_profile_image = List.select(:profile_image1).where('id = ?', @user.id).first
       @sendfrom_image = sendfrom_profile_image["profile_image1"]
        
     else
       #レコードがある場合
       
       @message = Message.new
-      @message.sendfrom_list_id = params[:sendfrom_list_id]
+      @message.sendfrom_list_id = @user.id
       @message.sendto_list_id = params[:sendto_list_id]
       @message.room_id = result[0]["room_id"]
       @message.body = params[:body]
       
       #logger.info("params[:sendfrom_list_id]:#{params[:sendfrom_list_id]}")
       #logger.info("result[0]['sendfrom_list_id']:#{result[0]['sendfrom_list_id']}")
-      if result[0]["sendfrom_list_id"] == params[:sendfrom_list_id].to_i then
+      if result[0]["sendfrom_list_id"] == @user.id then
         obj = List.find(result[0]["sendfrom_list_id"])
       else
         #resultsはルームの最後のメッセージなので、相手が最後にメッセージを送ったときの場合
@@ -947,9 +961,10 @@ class ApiController < ApplicationController
   def check_app_token 
     app_token = params[:app_token]
     @user = List.find_by_app_token(app_token)
-
+    logger.info("AppToken-UserID :#{@user.id}")
     # app_token にひもづくユーザーが見つからなかったときはエラー
     if @user == nil
+      logger.info("AppToken-UserID :NULL")
       respond_to do |format|
         format.json { render :json => {:error => 'Auth error'} }
       end
@@ -961,7 +976,7 @@ class ApiController < ApplicationController
     # ここにきた時点ですでに before_filter の check_app_token をチェック済みのはず
     # 認証されたユーザ情報は インスタンス変数 @user に格納されています
     respond_to do |format|
-      format.json { render :json => {:result => 'OK', :user => @user }}
+      format.json { render :json => {:result => 'OK', :user => @user.id }}
     end
   end
 end

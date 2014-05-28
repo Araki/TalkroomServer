@@ -17,7 +17,7 @@ class ApiController < ApplicationController
                                             :update_profile,
                                             :update_detail_profile,
                                             :create_message,
-                                            :create_account
+                                            #:create_account
                                             ]
   
   #before_filter :check_logined
@@ -270,6 +270,7 @@ class ApiController < ApplicationController
   #ユーザーID：user_id
   #================================================================
   def get_oneside_rooms
+=begin
     #（１）USERがメッセージを送った相手全員のIDを取得
     sql1 = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE R.id = M.room_id AND M.sendfrom_list_id = ' + @user.id + ' GROUP BY M.sendto_list_id ORDER BY R.updated_at DESC;'
     results = ActiveRecord::Base.connection.select(sql1)
@@ -287,6 +288,60 @@ class ApiController < ApplicationController
         end
       end
     end
+    
+    #ハッシュ配列を整形
+    results.each do |result|
+      nickname, profile_image, profile = nil
+      obj = List.select("id, nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
+      val.push({
+        :sendto_id => obj["id"],
+        :nickname => obj["nickname"], 
+        :profile_image => obj["profile_image1"], 
+        :profile => obj["profile"], 
+        :room_updated => exchangeTime( result["updated_at"].to_time ), 
+        :room_public => result["public"], 
+        :room_id => result["room_id"]
+      })
+    end
+    
+    respond_to do |format|
+      format.json { render :json => val }
+    end
+=end
+
+    rooms = Arel::Table.new(:rooms, :as => 'rooms')#Arel::Table.new(:rooms)
+    messages = Arel::Table.new(:messages, :as => 'messages')#Arel::Table.new(:messages)
+
+    #このユーザーがメッセージを送った相手のユニークなルームIDリスト
+    sendtoLists =  messages.
+                   project(messages[:room_id]).
+                   where(messages[:sendto_list_id].eq(@user.id)).
+                   group(messages[:room_id]).
+                   order(messages[:id].desc) 
+
+    query = messages.
+            join(rooms).
+            on(messages[:room_id].eq(rooms[:id])).
+            project(messages[:id],
+                    messages[:sendfrom_list_id],
+                    messages[:sendto_list_id],
+                    messages[:room_id],
+                    rooms[:public],
+                    rooms[:updated_at]
+            ).
+            where(messages[:room_id].not_in(sendtoLists)).
+            where(messages[:sendfrom_list_id].eq(@user.id)).
+            group(messages[:room_id]).
+            order(messages[:id].desc)
+            
+    sql = query.to_sql
+    logger.info("============================")
+    logger.info(sql)
+    
+    #双方向でメッセージを送りあった相手全員のIDを取得
+    results = ActiveRecord::Base.connection.select(sql)
+    
+    val = []
     
     #ハッシュ配列を整形
     results.each do |result|
@@ -367,7 +422,7 @@ class ApiController < ApplicationController
         :nickname => obj["nickname"], 
         :profile_image => obj["profile_image1"], 
         :profile => obj["profile"], 
-        :room_updated => result["updated_at"], 
+        :room_updated => exchangeTime( result["updated_at"].to_time ), 
         :room_public => result["public"], 
         :room_id => result["room_id"]
       })
@@ -393,7 +448,7 @@ class ApiController < ApplicationController
   #================================================================
   def get_detail_profile
     result = List.
-             where('id = ?', @user.id).
+             where('id = ?', params[:user_id]).
              select("id, 
                     nickname, 
                     profile_image1, 
@@ -895,6 +950,7 @@ class ApiController < ApplicationController
       # ユーザ検索
       user = List.find_by_fb_uid params[:fb_uid]
       app_token = user.app_token
+      user_id = user.id
       flag = "true"
     else
       logger.info("Check access token : Failure")
@@ -903,7 +959,7 @@ class ApiController < ApplicationController
     end
     
     respond_to do |format|
-      format.json { render :json => {:result => flag, :app_token => app_token} }
+      format.json { render :json => {:result => flag, :app_token => app_token, :user_id => user_id} }
     end
   end
   
@@ -961,7 +1017,7 @@ class ApiController < ApplicationController
   def check_app_token 
     app_token = params[:app_token]
     @user = List.find_by_app_token(app_token)
-    logger.info("AppToken-UserID :#{@user.id}")
+    logger.info("AppToken-UserID :#{@user}")
     # app_token にひもづくユーザーが見つからなかったときはエラー
     if @user == nil
       logger.info("AppToken-UserID :NULL")

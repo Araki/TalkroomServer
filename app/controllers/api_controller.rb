@@ -270,45 +270,6 @@ class ApiController < ApplicationController
   #ユーザーID：user_id
   #================================================================
   def get_oneside_rooms
-=begin
-    #（１）USERがメッセージを送った相手全員のIDを取得
-    sql1 = 'SELECT M.id, M.sendfrom_list_id, MIN(M.sendto_list_id) AS sendto_list_id, M.room_id, R.public, R.updated_at FROM messages AS M, rooms AS R WHERE R.id = M.room_id AND M.sendfrom_list_id = ' + @user.id + ' GROUP BY M.sendto_list_id ORDER BY R.updated_at DESC;'
-    results = ActiveRecord::Base.connection.select(sql1)
-    #（２）双方向でメッセージを送りあった相手全員のIDを取得
-    sql2 = 'SELECT DISTINCT sendfrom_list_id FROM messages WHERE sendfrom_list_id IN ( SELECT DISTINCT sendto_list_id FROM messages WHERE sendfrom_list_id = ' + @user.id + ') GROUP BY sendfrom_list_id;'
-    mutual_send_users = ActiveRecord::Base.connection.select(sql2)
-    
-    val =[]
-    
-    #（１）から（２）の配列を取り除く
-    mutual_send_users.each do |user|
-      results.each do |result|
-        if result["sendto_list_id"] == user["sendfrom_list_id"] then
-          results.delete(result)
-        end
-      end
-    end
-    
-    #ハッシュ配列を整形
-    results.each do |result|
-      nickname, profile_image, profile = nil
-      obj = List.select("id, nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
-      val.push({
-        :sendto_id => obj["id"],
-        :nickname => obj["nickname"], 
-        :profile_image => obj["profile_image1"], 
-        :profile => obj["profile"], 
-        :room_updated => exchangeTime( result["updated_at"].to_time ), 
-        :room_public => result["public"], 
-        :room_id => result["room_id"]
-      })
-    end
-    
-    respond_to do |format|
-      format.json { render :json => val }
-    end
-=end
-
     rooms = Arel::Table.new(:rooms, :as => 'rooms')#Arel::Table.new(:rooms)
     messages = Arel::Table.new(:messages, :as => 'messages')#Arel::Table.new(:messages)
 

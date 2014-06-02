@@ -847,21 +847,23 @@ class ApiController < ApplicationController
     # access_token チェック
     if Digest::MD5.hexdigest(Digest::MD5.hexdigest(params[:fb_uid])) != params[:access_token] 
       # 異なるときはエラー
-      format.json { render :json => {:error => "Invalid Access Token", :status => 403 }}
-      return;
-    end
+      respond_to do |format|
+        format.json { render :json => {:error => "Invalid Access Token", :status => 403 }}
+      end
+    else
+      # セキュリティ向上のためのトークンを生成
+      # （ここで生成された値をスマートフォン側に保存しておく必要あり）
+      @list.app_token = params[:fb_uid] + "-" + Digest::MD5.hexdigest(params[:fb_uid] + Time.now.to_s)
     
-    # セキュリティ向上のためのトークンを生成
-    # （ここで生成された値をスマートフォン側に保存しておく必要あり）
-    @list.app_token = params[:fb_uid] + "-" + Digest::MD5.hexdigest(params[:fb_uid] + Time.now.to_s)
-    
-    respond_to do |format|
-      if @list.save       
-        format.json { render :json => @list, :status => 200 }
-      else
-        format.json { render :json => @list.errors, :status => :unprocessable_entity }
+      respond_to do |format|
+        if @list.save       
+          format.json { render :json => @list, :status => 200 }
+        else
+          format.json { render :json => @list.errors, :status => :unprocessable_entity }
+        end
       end
     end
+    
   end
   
   
@@ -1022,19 +1024,18 @@ class ApiController < ApplicationController
       @ca_reward.aff_id = params[:aff_id]
       @ca_reward.point = params[:point]
     
+      respond_to do |format|
+        if @ca_reward.save       
+          #format.html { render :text => "OK" }
+          format.json { render :json => {:body => "OK"}}
+        else
+          #format.html { render :text => "NG" }
+          format.json { render :json => {:body => "NG"}}
+        end
+      end
     else
       respond_to do |format|
         #format.html { render :text => "NG"}
-        format.json { render :json => {:body => "NG"}}
-      end
-    end
-    
-    respond_to do |format|
-      if @ca_reward.save       
-        #format.html { render :text => "OK" }
-        format.json { render :json => {:body => "OK"}}
-      else
-        #format.html { render :text => "NG" }
         format.json { render :json => {:body => "NG"}}
       end
     end

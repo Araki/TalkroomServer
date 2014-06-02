@@ -1022,9 +1022,11 @@ class ApiController < ApplicationController
       @ca_reward.aff_id = params[:aff_id]
       @ca_reward.point = params[:point]
     
-    else      
-      #format.html { render :text => "NG"}
-      format.json { render :json => {:body => "NG"}}
+    else
+      respond_to do |format|
+        #format.html { render :text => "NG"}
+        format.json { render :json => {:body => "NG"}}
+      end
     end
     
     respond_to do |format|

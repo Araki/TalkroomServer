@@ -1008,6 +1008,10 @@ class ApiController < ApplicationController
     
     remote_ip = request.env["HTTP_X_FORWARDED_FOR"] || request.remote_ip
     logger.info("IP Address :#{remote_ip}")
+    
+    if remote_ip == "119.72.194.160" then
+      logger.info("$$$$$$$$$$$$$$$$$$$$$$$")
+    end
 =begin
     @ca_reward = Ca_reward.new
     @ca_reward.list_id = params[:list_id]

@@ -816,34 +816,6 @@ class ApiController < ApplicationController
   #アカウントを作成
   #================================================================
   def create_account
-
-    logger.info("===========Create Account===========")
-    logger.info(params[:channel])
-    logger.info(params[:fb_uid])
-    logger.info(params[:nickname])
-    logger.info(params[:gender])
-    logger.info(params[:email])
-    logger.info(params[:age])
-    logger.info(params[:purpose])
-    logger.info(params[:area])
-    logger.info(params[:profile_image1])
-    logger.info(params[:profile])
-    logger.info(params[:point])
-      
-    @list = List.new
-    @list.channel = params[:channel]
-    @list.fb_uid = params[:fb_uid]
-    @list.nickname = params[:nickname]
-    @list.gender = params[:gender]
-    @list.email = params[:email]
-    @list.age = params[:age]
-    @list.purpose = params[:purpose]
-    @list.area = params[:area]
-    @list.profile_image1 = params[:profile_image1]
-    @list.profile = params[:profile]
-    @list.point = params[:point]
-    @list.last_logined = Time.now.utc
-    
     # access_token チェック
     if Digest::MD5.hexdigest(Digest::MD5.hexdigest(params[:fb_uid])) != params[:access_token] 
       # 異なるときはエラー
@@ -851,6 +823,34 @@ class ApiController < ApplicationController
         format.json { render :json => {:error => "Invalid Access Token", :status => 403 }}
       end
     else
+      
+      logger.info("===========Create Account===========")
+      logger.info(params[:channel])
+      logger.info(params[:fb_uid])
+      logger.info(params[:nickname])
+      logger.info(params[:gender])
+      logger.info(params[:email])
+      logger.info(params[:age])
+      logger.info(params[:purpose])
+      logger.info(params[:area])
+      logger.info(params[:profile_image1])
+      logger.info(params[:profile])
+      logger.info(params[:point])
+        
+      @list = List.new
+      @list.channel = params[:channel]
+      @list.fb_uid = params[:fb_uid]
+      @list.nickname = params[:nickname]
+      @list.gender = params[:gender]
+      @list.email = params[:email]
+      @list.age = params[:age]
+      @list.purpose = params[:purpose]
+      @list.area = params[:area]
+      @list.profile_image1 = params[:profile_image1]
+      @list.profile = params[:profile]
+      @list.point = params[:point]
+      @list.last_logined = Time.now.utc
+    
       # セキュリティ向上のためのトークンを生成
       # （ここで生成された値をスマートフォン側に保存しておく必要あり）
       @list.app_token = params[:fb_uid] + "-" + Digest::MD5.hexdigest(params[:fb_uid] + Time.now.to_s)

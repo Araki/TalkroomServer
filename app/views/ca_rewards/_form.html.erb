@@ -1,0 +1,57 @@
+<%= form_for(@ca_reward) do |f| %>
+  <% if @ca_reward.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@ca_reward.errors.count, "error") %> prohibited this ca_reward from being saved:</h2>
+
+      <ul>
+      <% @ca_reward.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :id %><br />
+    <%= f.number_field :id %>
+  </div>
+  <div class="field">
+    <%= f.label :list_id %><br />
+    <%= f.number_field :list_id %>
+  </div>
+  <div class="field">
+    <%= f.label :cid %><br />
+    <%= f.number_field :cid %>
+  </div>
+  <div class="field">
+    <%= f.label :cname %><br />
+    <%= f.text_field :cname %>
+  </div>
+  <div class="field">
+    <%= f.label :carrier %><br />
+    <%= f.number_field :carrier %>
+  </div>
+  <div class="field">
+    <%= f.label :click_date %><br />
+    <%= f.number_field :click_date %>
+  </div>
+  <div class="field">
+    <%= f.label :action_date %><br />
+    <%= f.number_field :action_date %>
+  </div>
+  <div class="field">
+    <%= f.label :commission %><br />
+    <%= f.number_field :commission %>
+  </div>
+  <div class="field">
+    <%= f.label :aff_id %><br />
+    <%= f.text_field :aff_id %>
+  </div>
+  <div class="field">
+    <%= f.label :point %><br />
+    <%= f.number_field :point %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

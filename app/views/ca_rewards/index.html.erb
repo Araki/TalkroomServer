@@ -1,0 +1,41 @@
+<h1>Listing ca_rewards</h1>
+
+<table>
+  <tr>
+    <th>Id</th>
+    <th>List</th>
+    <th>Cid</th>
+    <th>Cname</th>
+    <th>Carrier</th>
+    <th>Click date</th>
+    <th>Action date</th>
+    <th>Commission</th>
+    <th>Aff</th>
+    <th>Point</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @ca_rewards.each do |ca_reward| %>
+  <tr>
+    <td><%= ca_reward.id %></td>
+    <td><%= ca_reward.list_id %></td>
+    <td><%= ca_reward.cid %></td>
+    <td><%= ca_reward.cname %></td>
+    <td><%= ca_reward.carrier %></td>
+    <td><%= ca_reward.click_date %></td>
+    <td><%= ca_reward.action_date %></td>
+    <td><%= ca_reward.commission %></td>
+    <td><%= ca_reward.aff_id %></td>
+    <td><%= ca_reward.point %></td>
+    <td><%= link_to 'Show', ca_reward %></td>
+    <td><%= link_to 'Edit', edit_ca_reward_path(ca_reward) %></td>
+    <td><%= link_to 'Destroy', ca_reward, :method => :delete, :data => { :confirm => 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Ca reward', new_ca_reward_path %>

@@ -1,0 +1,25 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  id: 1
+  list_id: 1
+  cid: 1
+  cname: MyString
+  carrier: 1
+  click_date: 1
+  action_date: 1
+  commission: 1
+  aff_id: MyString
+  point: 1
+
+two:
+  id: 1
+  list_id: 1
+  cid: 1
+  cname: MyString
+  carrier: 1
+  click_date: 1
+  action_date: 1
+  commission: 1
+  aff_id: MyString
+  point: 1

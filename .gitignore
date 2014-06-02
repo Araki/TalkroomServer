@@ -16,3 +16,10 @@
 
 /id_rsa_heroku
 /id_rsa_heroku.pub
+
+# SSL証明書
+/server.orig.key
+/server.key
+/server.csr
+/server.crt
+/chain_ca.pem

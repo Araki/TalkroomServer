@@ -1,0 +1,2 @@
+module CaRewardsHelper
+end

@@ -996,4 +996,32 @@ class ApiController < ApplicationController
       format.json { render :json => {:result => 'OK', :user => @user.id }}
     end
   end
+  
+  #================================================================
+  #CAリワード用のポイントバックAPI
+  #================================================================
+  #正常に完了した場合にはレスポンスBODY部に“OK”[半角大文字2文字]を返却
+  #通知元サーバIPアドレスのアクセス制限
+  #広告ID × 会員ID × 成果発生日時 × 成果地点IDの条件でポイントバック通知の重複チェック
+  #
+  def car_pointback
+    
+    remote_ip = request.env["HTTP_X_FORWARDED_FOR"] || request.remote_ip
+    logger.info("IP Address :#{remote_ip}")
+=begin
+    @ca_reward = Ca_reward.new
+    @ca_reward.list_id = params[:list_id]
+    @ca_reward.cid = params[:cid]
+    @ca_reward.cname = params[:cname]
+    @ca_reward.carrier = params[:carrier]
+    @ca_reward.click_date = params[:click_date]
+    @ca_reward.action_date = params[:action_date]
+    @ca_reward.commision = params[:commision]
+    @ca_reward.aff_id = params[:aff_id]
+    @ca_reward.point = params[:point]
+=end
+    
+  end
+  
+  
 end

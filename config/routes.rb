@@ -1,6 +1,8 @@
 Talkroom::Application.routes.draw do
 
 
+  resources :ca_rewards
+
   resources :friends
 
   resources :lists
@@ -23,6 +25,7 @@ Talkroom::Application.routes.draw do
   match "/create_friends" => "api#create_friends"
   
   match "/check_login" => "api#check_login"
+  match "/car_pointback" => "api#car_pointback"
   
   # トークン利用の例
   match "/example_token" => "api#example_token"

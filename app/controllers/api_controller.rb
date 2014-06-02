@@ -1001,7 +1001,6 @@ class ApiController < ApplicationController
   #CAリワード用のポイントバックAPI
   #================================================================
   #正常に完了した場合にはレスポンスBODY部に“OK”[半角大文字2文字]を返却
-  #通知元サーバIPアドレスのアクセス制限
   #広告ID × 会員ID × 成果発生日時 × 成果地点IDの条件でポイントバック通知の重複チェック
   #
   def car_pointback
@@ -1024,14 +1023,17 @@ class ApiController < ApplicationController
       @ca_reward.point = params[:point]
     
     else      
-      format.html { render :text => "NG"}
+      #format.html { render :text => "NG"}
+      format.json { render :json => {:body => "NG"}}
     end
     
     respond_to do |format|
       if @ca_reward.save       
-        format.html { render :text => "OK" }
+        #format.html { render :text => "OK" }
+        format.json { render :json => {:body => "OK"}}
       else
-        format.html { render :text => "NG" }
+        #format.html { render :text => "NG" }
+        format.json { render :json => {:body => "NG"}}
       end
     end
   end

@@ -1009,22 +1009,31 @@ class ApiController < ApplicationController
     remote_ip = request.env["HTTP_X_FORWARDED_FOR"] || request.remote_ip
     logger.info("IP Address :#{remote_ip}")
     
-    if remote_ip == "119.72.194.160" then
+    if remote_ip == "202.234.38.240" || remote_ip =="59.106.126.70" || remote_ip =="59.106.126.73" || remote_ip == "59.106.126.74" then
       logger.info("$$$$$$$$$$$$$$$$$$$$$$$")
-    end
-=begin
-    @ca_reward = Ca_reward.new
-    @ca_reward.list_id = params[:list_id]
-    @ca_reward.cid = params[:cid]
-    @ca_reward.cname = params[:cname]
-    @ca_reward.carrier = params[:carrier]
-    @ca_reward.click_date = params[:click_date]
-    @ca_reward.action_date = params[:action_date]
-    @ca_reward.commision = params[:commision]
-    @ca_reward.aff_id = params[:aff_id]
-    @ca_reward.point = params[:point]
-=end
+      
+      @ca_reward = Ca_reward.new
+      @ca_reward.list_id = params[:list_id]
+      @ca_reward.cid = params[:cid]
+      @ca_reward.cname = params[:cname]
+      @ca_reward.carrier = params[:carrier]
+      @ca_reward.click_date = params[:click_date]
+      @ca_reward.action_date = params[:action_date]
+      @ca_reward.commision = params[:commision]
+      @ca_reward.aff_id = params[:aff_id]
+      @ca_reward.point = params[:point]
     
+    else      
+      format.html { render :text => "NG"}
+    end
+    
+    respond_to do |format|
+      if @ca_reward.save       
+        format.html { render :text => "OK" }
+      else
+        format.html { render :text => "NG" }
+      end
+    end
   end
   
   

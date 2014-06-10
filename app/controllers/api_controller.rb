@@ -408,6 +408,18 @@ class ApiController < ApplicationController
   #ユーザーID：user_id
   #================================================================
   def get_detail_profile
+    
+ #===================
+ #visitsテーブルに記録
+ #===================
+    @visit = Visit.new
+    @visit.visitor_list_id = @user.id
+    @visit.visitat_list_id = params[:user_id]
+    @visit.save
+ 
+ #===================
+ #メイン処理
+ #===================    
     result = List.
              where('id = ?', params[:user_id]).
              select("id, 

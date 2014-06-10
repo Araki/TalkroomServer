@@ -1,6 +1,11 @@
 <p id="notice"><%= notice %></p>
 
 <p>
+  <b>ID:</b>
+  <%= @visit.id %>
+</p>
+
+<p>
   <b>Visitor:</b>
   <%= @visit.visitor.nickname %>
 </p>
@@ -10,6 +15,15 @@
   <%= @visit.visitat.nickname %>
 </p>
 
+<p>
+  <b>Created_at</b>
+  <%= @visit.created_at %>
+</p>
+
+<p>
+  <b>Visitor:</b>
+  <%= @visit.updated_at %>
+</p>
 
 <%= link_to 'Edit', edit_visit_path(@visit) %> |
 <%= link_to 'Back', visits_path %>

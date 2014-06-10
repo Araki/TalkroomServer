@@ -413,15 +413,19 @@ class ApiController < ApplicationController
  #visitsテーブルに記録
  #===================
     duplication = Visit.
-                  where(:visitor_list_id => @user.id).
-                  where(:visitat_list_id => params[:user_id])
+                  where('visitor_list_id = ?', @user.id).
+                  where('visitat_list_id = ?', params[:user_id]).
+                  first
     
-    cnt = duplication.count
-    logger.info("duplication:#{duplication.id}")
-    logger.info("count:#{cnt}")
-    if cnt > 0 then
+    #cnt = duplication.count
+    #logger.info("duplication:#{duplication.class}")
+    #logger.info("count:#{duplication.id}")
+    
+    if Visit.exists?(duplication) then
+      logger.info("EXIST!!!!!")
       duplication.update_attribute(:updated_at, Time.now.utc)
     else
+      logger.info("NOT EXIST!!!!!!!!")
       @visit = Visit.new
       @visit.visitor_list_id = @user.id
       @visit.visitat_list_id = params[:user_id]

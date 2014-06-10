@@ -2,8 +2,11 @@
 
 <table>
   <tr>
+  	<th>ID</th>
     <th>Visitor</th>
     <th>Visit at</th>
+    <th>created_at</th>
+    <th>updated_at</th>
     <th></th>
     <th></th>
     <th></th>
@@ -11,8 +14,11 @@
 
 <% @visits.each do |visit| %>
   <tr>
+  	<td><%= visit.id %></td>
     <td><%= visit.visitor.nickname %></td>
     <td><%= visit.visitat.nickname %></td>
+    <td><%= visit.created_at %></td>
+    <td><%= visit.updated_at %></td>
     <td><%= link_to 'Show', visit %></td>
     <td><%= link_to 'Edit', edit_visit_path(visit) %></td>
     <td><%= link_to 'Destroy', visit, :method => :delete, :data => { :confirm => 'Are you sure?' } %></td>

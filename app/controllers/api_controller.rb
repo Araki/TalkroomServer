@@ -816,6 +816,7 @@ class ApiController < ApplicationController
   #アカウントを作成
   #================================================================
   def create_account
+    
     # access_token チェック
     if Digest::MD5.hexdigest(Digest::MD5.hexdigest(params[:fb_uid])) != params[:access_token] 
       # 異なるときはエラー

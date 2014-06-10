@@ -916,6 +916,9 @@ class ApiController < ApplicationController
       app_token = user.app_token
       user_id = user.id
       flag = "true"
+      
+      user.update_attribute(:last_logined, Time.now.utc)
+      
     else
       logger.info("Check access token : Failure")
       flag = "false"

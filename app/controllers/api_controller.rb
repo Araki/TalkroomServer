@@ -412,10 +412,20 @@ class ApiController < ApplicationController
  #===================
  #visitsテーブルに記録
  #===================
-    @visit = Visit.new
-    @visit.visitor_list_id = @user.id
-    @visit.visitat_list_id = params[:user_id]
-    @visit.save
+    duplication = Visit.
+                  where(:visitor_list_id => @user.id).
+                  where(:visitat_list_id => params[:user_id])
+    
+    cnt = duplication.count
+          
+    if cnt > 0 then
+      duplication.update_attribute(:updated_at, Time.now.utc)
+    else
+      @visit = Visit.new
+      @visit.visitor_list_id = @user.id
+      @visit.visitat_list_id = params[:user_id]
+      @visit.save
+    end
  
  #===================
  #メイン処理

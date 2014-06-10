@@ -417,7 +417,8 @@ class ApiController < ApplicationController
                   where(:visitat_list_id => params[:user_id])
     
     cnt = duplication.count
-          
+    logger.info("duplication:#{duplication.id}")
+    logger.info("count:#{cnt}")
     if cnt > 0 then
       duplication.update_attribute(:updated_at, Time.now.utc)
     else

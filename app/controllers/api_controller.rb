@@ -17,6 +17,7 @@ class ApiController < ApplicationController
                                             :update_profile,
                                             :update_detail_profile,
                                             :create_message,
+                                            :get_visits
                                             #:create_account
                                             ]
   
@@ -396,7 +397,52 @@ class ApiController < ApplicationController
   end
   
   
+    #================================================================
+  #足あとリストの取得
+  #受け取るクエリ
+  #なし
+  #================================================================   
+  def get_visits
+    visits = Arel::Table.new(:visits, :as => 'visits')
+    lists = Arel::Table.new(:lists, :as => 'lists')
+    
+    query = visits.
+            join(lists).
+            on(visits[:visitor_list_id].eq(lists[:id])).
+            project(lists[:id],
+                    lists[:nickname],
+                    lists[:profile_image1],
+                    lists[:profile],
+                    lists[:area],
+                    lists[:purpose],
+                    visits[:updated_at]
+            ).
+            where(visits[:visitat_list_id].eq(@user.id)).
+            order(visits[:updated_at].desc).
+            take(10)
+            
+    sql = query.to_sql
+    
+    results = ActiveRecord::Base.connection.select(sql)
   
+    val = []
+    
+    results.each do |result|
+      val.push({
+        :id => result["id"],
+        :nickname => result["nickname"],
+        :profile_image1 => result["profile_image1"],
+        :profile => result["profile"],
+        :area => result["area"], 
+        :purpose => result["purpose"],
+        :updated_at => exchangeTime(result["updated_at"].to_time)
+      })
+    end
+      
+    respond_to do |format|
+      format.json { render :json => val }
+    end
+  end
   
   
   
@@ -412,25 +458,32 @@ class ApiController < ApplicationController
  #===================
  #visitsテーブルに記録
  #===================
-    duplication = Visit.
-                  where('visitor_list_id = ?', @user.id).
-                  where('visitat_list_id = ?', params[:user_id]).
-                  first
+    logger.info("ID:#{@user.id.to_s.class}==#{params[:user_id].class}")
     
-    #cnt = duplication.count
-    #logger.info("duplication:#{duplication.class}")
-    #logger.info("count:#{duplication.id}")
-    
-    if Visit.exists?(duplication) then
-      logger.info("EXIST!!!!!")
-      duplication.update_attribute(:updated_at, Time.now.utc)
-    else
-      logger.info("NOT EXIST!!!!!!!!")
-      @visit = Visit.new
-      @visit.visitor_list_id = @user.id
-      @visit.visitat_list_id = params[:user_id]
-      @visit.save
+    if @user.id.to_s != params[:user_id] then
+      
+      duplication = Visit.
+                    where('visitor_list_id = ?', @user.id).
+                    where('visitat_list_id = ?', params[:user_id]).
+                    first
+      
+      #cnt = duplication.count
+      #logger.info("duplication:#{duplication.class}")
+      #logger.info("count:#{duplication.id}")
+      
+      if Visit.exists?(duplication) then
+        logger.info("EXIST!!!!!")
+        duplication.update_attribute(:updated_at, Time.now.utc)
+      else
+        logger.info("NOT EXIST!!!!!!!!")
+        @visit = Visit.new
+        @visit.visitor_list_id = @user.id
+        @visit.visitat_list_id = params[:user_id]
+        @visit.save
+      end
+      
     end
+    
  
  #===================
  #メイン処理
@@ -549,14 +602,6 @@ class ApiController < ApplicationController
     end
   end
   
-    
-    
-    
-    
-    
-    
-    
-    
     
     
   #================================================================

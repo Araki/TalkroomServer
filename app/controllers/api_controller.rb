@@ -458,7 +458,6 @@ class ApiController < ApplicationController
  #===================
  #visitsテーブルに記録
  #===================
-    logger.info("ID:#{@user.id.to_s.class}==#{params[:user_id].class}")
     
     if @user.id.to_s != params[:user_id] then
       
@@ -466,10 +465,6 @@ class ApiController < ApplicationController
                     where('visitor_list_id = ?', @user.id).
                     where('visitat_list_id = ?', params[:user_id]).
                     first
-      
-      #cnt = duplication.count
-      #logger.info("duplication:#{duplication.class}")
-      #logger.info("count:#{duplication.id}")
       
       if Visit.exists?(duplication) then
         logger.info("EXIST!!!!!")

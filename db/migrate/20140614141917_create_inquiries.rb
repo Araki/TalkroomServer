@@ -4,7 +4,7 @@ class CreateInquiries < ActiveRecord::Migration
       t.integer :list_id
       t.string :platform
       t.string :address
-      t.text :body
+      
 
       t.timestamps
     end

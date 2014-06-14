@@ -1113,6 +1113,9 @@ class ApiController < ApplicationController
     end
   end
   
+  
+  
+  
   def send_mail
     
     @inquiry = Inquiry.new

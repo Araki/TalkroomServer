@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  type: 
+  product_id: MyString
+  transaction_id: MyString
+  purchase_date: 2014-06-14 22:32:30
+  bvrs: MyString
+
+two:
+  type: 
+  product_id: MyString
+  transaction_id: MyString
+  purchase_date: 2014-06-14 22:32:30
+  bvrs: MyString

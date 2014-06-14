@@ -1,0 +1,20 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>List:</b>
+  <%= @buying_history.list_id %>
+</p>
+
+<p>
+  <b>Platform:</b>
+  <%= @buying_history.platform %>
+</p>
+
+<p>
+  <b>Transaction:</b>
+  <%= @buying_history.transaction_id %>
+</p>
+
+
+<%= link_to 'Edit', edit_buying_history_path(@buying_history) %> |
+<%= link_to 'Back', buying_histories_path %>

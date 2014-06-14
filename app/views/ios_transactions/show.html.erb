@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Type:</b>
+  <%= @ios_transaction.type %>
+</p>
+
+<p>
+  <b>Product:</b>
+  <%= @ios_transaction.product_id %>
+</p>
+
+<p>
+  <b>Transaction:</b>
+  <%= @ios_transaction.transaction_id %>
+</p>
+
+<p>
+  <b>Purchase date:</b>
+  <%= @ios_transaction.purchase_date %>
+</p>
+
+<p>
+  <b>Bvrs:</b>
+  <%= @ios_transaction.bvrs %>
+</p>
+
+
+<%= link_to 'Edit', edit_ios_transaction_path(@ios_transaction) %> |
+<%= link_to 'Back', ios_transactions_path %>

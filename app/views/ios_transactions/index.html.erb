@@ -1,0 +1,31 @@
+<h1>Listing ios_transactions</h1>
+
+<table>
+  <tr>
+    <th>Type</th>
+    <th>Product</th>
+    <th>Transaction</th>
+    <th>Purchase date</th>
+    <th>Bvrs</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @ios_transactions.each do |ios_transaction| %>
+  <tr>
+    <td><%= ios_transaction.type %></td>
+    <td><%= ios_transaction.product_id %></td>
+    <td><%= ios_transaction.transaction_id %></td>
+    <td><%= ios_transaction.purchase_date %></td>
+    <td><%= ios_transaction.bvrs %></td>
+    <td><%= link_to 'Show', ios_transaction %></td>
+    <td><%= link_to 'Edit', edit_ios_transaction_path(ios_transaction) %></td>
+    <td><%= link_to 'Destroy', ios_transaction, :method => :delete, :data => { :confirm => 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Ios transaction', new_ios_transaction_path %>

@@ -1112,5 +1112,12 @@ class ApiController < ApplicationController
     end
   end
   
+  def send_mail
+    mail = InquiryMailer.sendmail_confirm(params[:mail], params[:body]).deliver
+    respond_to do |format|
+      format.json{ render :text => "OK" }
+    end
+  end
+  
   
 end

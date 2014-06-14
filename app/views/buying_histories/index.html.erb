@@ -1,0 +1,27 @@
+<h1>Listing buying_histories</h1>
+
+<table>
+  <tr>
+    <th>List</th>
+    <th>Platform</th>
+    <th>Transaction</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @buying_histories.each do |buying_history| %>
+  <tr>
+    <td><%= buying_history.list_id %></td>
+    <td><%= buying_history.platform %></td>
+    <td><%= buying_history.transaction_id %></td>
+    <td><%= link_to 'Show', buying_history %></td>
+    <td><%= link_to 'Edit', edit_buying_history_path(buying_history) %></td>
+    <td><%= link_to 'Destroy', buying_history, :method => :delete, :data => { :confirm => 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Buying history', new_buying_history_path %>

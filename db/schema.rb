@@ -10,7 +10,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140602075356) do
+ActiveRecord::Schema.define(:version => 20140614133508) do
+
+  create_table "buying_histories", :force => true do |t|
+    t.integer  "list_id"
+    t.string   "platform"
+    t.integer  "transaction_id"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
+  end
 
   create_table "ca_rewards", :force => true do |t|
     t.integer  "list_id"
@@ -32,6 +40,16 @@ ActiveRecord::Schema.define(:version => 20140602075356) do
     t.string   "fb_gender"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
+  end
+
+  create_table "ios_transactions", :force => true do |t|
+    t.string   "type"
+    t.string   "product_id"
+    t.string   "transaction_id"
+    t.datetime "purchase_date"
+    t.string   "bvrs"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
   end
 
   create_table "lists", :force => true do |t|

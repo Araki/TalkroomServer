@@ -1,6 +1,10 @@
 Talkroom::Application.routes.draw do
 
 
+  resources :buying_histories
+
+  resources :ios_transactions
+
   resources :ca_rewards
 
   resources :friends
@@ -27,6 +31,7 @@ Talkroom::Application.routes.draw do
   
   match "/check_login" => "api#check_login"
   match "/car_pointback" => "api#car_pointback"
+  match "/send_mail" => "api#send_mail"
   
   # トークン利用の例
   match "/example_token" => "api#example_token"

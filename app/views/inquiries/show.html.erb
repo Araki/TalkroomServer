@@ -1,0 +1,45 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>ID:</b>
+  <%= @inquiry.id %>
+</p>
+
+<p>
+  <b>List:</b>
+  <%= @inquiry.list_id %>
+</p>
+
+<p>
+  <b>Body:</b>
+  <%= @inquiry.body %>
+</p>
+
+<p>
+  <b>Address:</b>
+  <%= @inquiry.address %>
+</p>
+
+<p>
+  <b>Platform:</b>
+  <%= @inquiry.platform %>
+</p>
+
+<p>
+  <b>Version:</b>
+  <%= @inquiry.version %>
+</p>
+
+<p>
+  <b>Manufacturer:</b>
+  <%= @inquiry.manufacturer %>
+</p>
+
+<p>
+  <b>Model:</b>
+  <%= @inquiry.model %>
+</p>
+
+
+<%= link_to 'Edit', edit_inquiry_path(@inquiry) %> |
+<%= link_to 'Back', inquiries_path %>

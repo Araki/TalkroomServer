@@ -6,13 +6,19 @@ class InquiryMailer < ActionMailer::Base
   #
   #   en.inquiry_mailer.sendmail_confirm.subject
   #
-  def sendmail_confirm(mail, body)
+
+  def sendmail_confirm( id, platform, version, manufacturer, model, mail, body)
+    subject = "お問い合わせ:#{format("%05d", id)}"
+    @platform = platform
+    @version = version
+    @manufacturer = manufacturer
+    @model = model
     @address = mail
     @body = body
     
     #mail(:to => "araki@shiftage.jp", :subject => "お問い合わせ") do |format|
       #format.text { render :text => body }
     #end
-    mail(:to => "araki@shiftage.jp", :subject => "お問い合わせ")
+    mail(:to => "araki@shiftage.jp", :subject => subject)
   end
 end

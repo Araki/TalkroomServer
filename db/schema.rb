@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140614145143) do
+ActiveRecord::Schema.define(:version => 20140615100536) do
 
   create_table "buying_histories", :force => true do |t|
     t.integer  "list_id"
@@ -63,6 +63,8 @@ ActiveRecord::Schema.define(:version => 20140614145143) do
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
   end
+
+  add_index "ios_transactions", ["transaction_id"], :name => "index_ios_transactions_on_transaction_id", :unique => true
 
   create_table "lists", :force => true do |t|
     t.datetime "created_at",                                     :null => false

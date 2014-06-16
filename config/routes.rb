@@ -35,6 +35,8 @@ Talkroom::Application.routes.draw do
   match "/car_pointback" => "api#car_pointback"
   match "/send_mail" => "api#send_mail"
   
+  match "/verify_receipt" => "api#verify_receipt", :defaults => {:format => :json}
+  
   # トークン利用の例
   match "/example_token" => "api#example_token"
   

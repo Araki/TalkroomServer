@@ -18,7 +18,8 @@ class ApiController < ApplicationController
                                             :update_detail_profile,
                                             :create_message,
                                             :get_visits,
-                                            :send_mail
+                                            :send_mail,
+                                            :verify_receipt
                                             #:create_account
                                             ]
   
@@ -998,9 +999,64 @@ class ApiController < ApplicationController
     end
   end
   
-  
-  
-  
+  #================================================================
+  # レシートを受け取り，検証し，DBに保存する
+  #================================================================
+  def verify_receipt
+    data = params[:receipt]
+    
+    isError = false
+    @result = {   # 成功時の返却値
+      :code => 0,
+      :message => ''
+    }
+    
+    begin
+      receipt = Venice::Receipt.verify!(data)
+      receipt_detail = receipt.to_h
+      
+      # トランザクションによるデータ一貫性保護
+      ActiveRecord::Base.transaction do
+        transaction = IosTransaction.new({
+          :type => 'non-consumable',
+          :product_id => receipt_detail[:product_id],
+          :transaction_id => receipt_detail[:transaction_id],
+          :purchase_date => receipt_detail[:purchase_date],
+          :bvrs => receipt_detail[:bvrs]
+        })
+        transaction.save!
+        
+        history = BuyingHistory.new({
+          :list_id => @user.id,
+          :platform => 'ios',
+          :transaction_id => transaction.id
+        })
+        history.save!
+      end
+    rescue Venice::Receipt::VerificationError => e
+      # Receipt に関するエラーが発生したとき
+      isError = true 
+      @result = {
+        :code => e.code,
+        :message => e.message
+      }
+    rescue => e
+      # 未知のエラーが発生したとき
+      isError = true 
+      @result = {
+        :code => 9,            # 未知のエラーのときは 9 とする
+        :message => e.message
+      }
+    end
+    
+    respond_to do |format|
+      if isError == false
+        format.json { render :json => @result, :status => 200 }
+      else
+        format.json { render :json => @result, :status => :unprocessable_entity }
+      end
+    end
+  end
   
   #================================================================
   #時間を「〜分前」に変換するメソッド

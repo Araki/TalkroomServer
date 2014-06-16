@@ -14,8 +14,8 @@ Talkroom::Application.configure do
   config.action_controller.perform_caching = false
 
   # Don't care if the mailer can't send
-  require 'tlsmail'
-  Net::SMTP.enable_tls( OpenSSL::SSL::VERIFY_NONE )
+  #require 'tlsmail'
+  #Net::SMTP.enable_tls( OpenSSL::SSL::VERIFY_NONE )
   
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.raise_delivery_errors = true

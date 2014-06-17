@@ -43,6 +43,18 @@ ActiveRecord::Schema.define(:version => 20140615100536) do
     t.datetime "updated_at", :null => false
   end
 
+  create_table "inquiries", :force => true do |t|
+    t.integer  "list_id"
+    t.string   "platform"
+    t.string   "address"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+    t.text     "body"
+    t.string   "version"
+    t.string   "manufacturer"
+    t.string   "model"
+  end
+
   create_table "ios_transactions", :force => true do |t|
     t.string   "type"
     t.string   "product_id"

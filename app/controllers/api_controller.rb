@@ -18,7 +18,8 @@ class ApiController < ApplicationController
                                             :update_detail_profile,
                                             :create_message,
                                             :get_visits,
-                                            :verify_receipt
+                                            :verify_receipt,
+                                            :send_mail
                                             #:create_account
                                             ]
   
@@ -1168,10 +1169,33 @@ class ApiController < ApplicationController
     end
   end
   
+  
+  
+  
   def send_mail
-    mail = InquiryMailer.sendmail_confirm(params[:mail], params[:body]).deliver
+    
+    @inquiry = Inquiry.new
+    @inquiry.list_id = @user.id
+    @inquiry.platform = params[:platform]
+    @inquiry.version = params[:version]
+    @inquiry.manufacturer = params[:manufacturer]
+    @inquiry.model = params[:model]
+    @inquiry.address = params[:mail]
+    @inquiry.body = params[:body]
+  
     respond_to do |format|
-      format.json{ render :text => "OK" }
+      if @inquiry.save       
+        mail = InquiryMailer.sendmail_confirm(@inquiry.id,
+                                              params[:platform], 
+                                              params[:version], 
+                                              params[:manufacturer],
+                                              params[:model],
+                                              params[:mail], 
+                                              params[:body]).deliver
+        format.json{ render :text => "OK" }
+      else
+        format.json { render :json => @list.errors, :status => :unprocessable_entity }
+      end
     end
   end
   

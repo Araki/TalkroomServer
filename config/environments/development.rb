@@ -22,8 +22,8 @@ Talkroom::Application.configure do
     :ssl => true,
     :enable_starttls_auto => true,
     :address => 'smtp.gmail.com',
-    :port => 25,#'587',
-    :domain => 'smtp.gmail.com',
+    :port => 465,
+    #:domain => 'smtp.gmail.com',
     :authentication => 'plain',
     :user_name => 'admin@talkroom.co',
     :password => 'Pairful1001'

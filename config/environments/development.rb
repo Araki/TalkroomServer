@@ -14,8 +14,6 @@ Talkroom::Application.configure do
   config.action_controller.perform_caching = false
 
   # Don't care if the mailer can't send
-  #require 'tlsmail'
-  #Net::SMTP.enable_tls( OpenSSL::SSL::VERIFY_NONE )
   
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.raise_delivery_errors = true
@@ -23,7 +21,7 @@ Talkroom::Application.configure do
     :enable_starttls_auto => true,
     :address => 'smtp.gmail.com',
     :port => '587',
-    :domain => 'smtp.gmail.com',
+    #:domain => 'smtp.gmail.com',
     :authentication => 'plain',
     :user_name => 'admin@talkroom.co',
     :password => 'Pairful1001'

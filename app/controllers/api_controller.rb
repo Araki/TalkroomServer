@@ -1174,8 +1174,23 @@ class ApiController < ApplicationController
   
   def send_mail
     # SSL/TLSを有効に
-    #require 'tlsmail'
-    #Net::SMTP.enable_tls( OpenSSL::SSL::VERIFY_NONE )
+    require 'tlsmail'
+    Net::SMTP.enable_tls(OpenSSL::SSL::VERIFY_NONE)
+    
+    ActionMailer::Base.delivery_method = :smtp
+    ActionMailer::Base.raise_delivery_errors = true
+    ActionMailer::Base.perform_deliveries = true
+    ActionMailer::Base.smtp_settings = {
+      #:openssl_verify_mode => OpenSSL::SSL::VERIFY_NONE,      
+      :tls => true,
+      :enable_starttls_auto => true,
+      :address => 'smtp.gmail.com',
+      :port => 587,
+      :domain => 'smtp.gmail.com',
+      :authentication => :login,#'plain',
+      :user_name => 'admin@talkroom.co',
+      :password => 'Pairful1001'
+    }
     
     @inquiry = Inquiry.new
     @inquiry.list_id = @user.id

@@ -1174,8 +1174,8 @@ class ApiController < ApplicationController
   
   def send_mail
     # SSL/TLSを有効に
-    require 'tlsmail'
-    Net::SMTP.enable_tls( OpenSSL::SSL::VERIFY_NONE )
+    #require 'tlsmail'
+    #Net::SMTP.enable_tls( OpenSSL::SSL::VERIFY_NONE )
     
     @inquiry = Inquiry.new
     @inquiry.list_id = @user.id

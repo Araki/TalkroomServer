@@ -18,11 +18,11 @@ Talkroom::Application.configure do
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.smtp_settings = {
-    :openssl_verify_mode => OpenSSL::SSL::VERIFY_NONE,      
-    :ssl => true,
+    #:openssl_verify_mode => OpenSSL::SSL::VERIFY_NONE,      
+    #:ssl => true,
     :enable_starttls_auto => true,
     :address => 'smtp.gmail.com',
-    :port => 465,
+    :port => 25,#587,
     #:domain => 'smtp.gmail.com',
     :authentication => 'plain',
     :user_name => 'admin@talkroom.co',

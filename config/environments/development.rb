@@ -24,7 +24,7 @@ Talkroom::Application.configure do
     :address => 'smtp.gmail.com',
     :port => 25,#587,
     #:domain => 'smtp.gmail.com',
-    :authentication => 'plain',
+    :authentication => :login,#'plain',
     :user_name => 'admin@talkroom.co',
     :password => 'Pairful1001'
   }

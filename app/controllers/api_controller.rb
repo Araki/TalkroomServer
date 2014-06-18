@@ -1182,12 +1182,12 @@ class ApiController < ApplicationController
     ActionMailer::Base.perform_deliveries = true
     ActionMailer::Base.smtp_settings = {
       #:openssl_verify_mode => OpenSSL::SSL::VERIFY_NONE,      
-      :tls => true,
+      :ssl => true,
       :enable_starttls_auto => true,
       :address => 'smtp.gmail.com',
       :port => 587,
       :domain => 'smtp.gmail.com',
-      :authentication => :login,#'plain',
+      :authentication => :plain,
       :user_name => 'admin@talkroom.co',
       :password => 'Pairful1001'
     }

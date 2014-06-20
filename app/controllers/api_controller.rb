@@ -1033,6 +1033,14 @@ class ApiController < ApplicationController
         })
         history.save!
       end
+      
+    rescue ActiveRecord::RecordNotUnique => e
+      # 重複行エラー
+      isError = false #エラーとしない
+      @result = {
+        code: 0,
+        message: ''
+      }
     rescue Venice::Receipt::VerificationError => e
       # Receipt に関するエラーが発生したとき
       isError = true 

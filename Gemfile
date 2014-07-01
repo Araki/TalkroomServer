@@ -7,6 +7,8 @@ gem 'rails', '3.2.6'
 group :development do
   #gem 'mysql', '2.9.1'
   gem 'mysql2'
+  gem 'hirb'
+  gem 'hirb-unicode'
   #gem "activerecord-jdbcmysql-adapter"
 end
 #gem 'pg', groups: %w(production), require:false

@@ -19,7 +19,8 @@ class ApiController < ApplicationController
                                             :create_message,
                                             :get_visits,
                                             :send_mail,
-                                            :verify_receipt
+                                            :verify_receipt,
+                                            :get_point
                                             #:create_account
                                             ]
   
@@ -667,6 +668,24 @@ class ApiController < ApplicationController
       format.json { render :json => val }
     end
   end
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  #================================================================
+  #ユーザーのポイントを取得
+  #================================================================
+  def get_point
+    result = List.find(@user.id)
+    respond_to do |format|
+      format.json { render :json => result.point }
+    end
+  end
     
     
     
@@ -1032,14 +1051,26 @@ class ApiController < ApplicationController
           :transaction_id => transaction.id
         })
         history.save!
+        
+        case receipt_detail[:product_id]
+        when "jp.shiftage.talkroom.testpoint100" then
+          point = 100
+        when "jp.shiftage.talkroom.testpoint300" then
+          point = 300
+        when "jp.shiftage.talkroom.testpoint500" then
+          point = 500
+        end
+        @list = List.find(@user.id)
+        @list.update_attribute(:point, @list.point + point)
+        
       end
       
     rescue ActiveRecord::RecordNotUnique => e
       # 重複行エラー
       isError = false #エラーとしない
       @result = {
-        code: 0,
-        message: ''
+        :code => 0,
+        :message => ''
       }
     rescue Venice::Receipt::VerificationError => e
       # Receipt に関するエラーが発生したとき

@@ -1018,7 +1018,7 @@ class ApiController < ApplicationController
       # トランザクションによるデータ一貫性保護
       ActiveRecord::Base.transaction do
         transaction = IosTransaction.new({
-          :purchase_type => 'non-consumable',
+          :purchase_type => 'consumable',
           :product_id => receipt_detail[:product_id],
           :transaction_id => receipt_detail[:transaction_id],
           :purchase_date => receipt_detail[:purchase_date],

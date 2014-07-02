@@ -693,7 +693,7 @@ class ApiController < ApplicationController
   #================================================================
   def consume_point
     before_point = @user.point
-    after_point = before_point - params[:consume_point]
+    after_point = before_point - params[:consume_point].to_i
      
     respond_to do |format|
       if @user.update_attribute(:point, after_point)

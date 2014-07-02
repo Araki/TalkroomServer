@@ -691,16 +691,17 @@ class ApiController < ApplicationController
   #================================================================
   #ユーザーのポイントを消費
   #================================================================
-   def consume_point
-     before_point = @user.point
-     after_point = before_point - params[:consume_point]
+  def consume_point
+    before_point = @user.point
+    after_point = before_point - params[:consume_point]
      
-     respond_to do |format|
+    respond_to do |format|
       if @user.update_attribute(:point, after_point)
         format.json { render :json => @user.point, :status => 200 }
       else
         format.json { render :json => @user.errors, :status => :unprocessable_entity }
       end
+    end
    end
     
     

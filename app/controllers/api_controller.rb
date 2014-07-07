@@ -1104,7 +1104,7 @@ class ApiController < ApplicationController
     
     respond_to do |format|
       if isError == false
-        format.json { render :json => @result, :status => 200 }
+        format.json { render :json => @list.point, :status => 200 }
       else
         format.json { render :json => @result, :status => :unprocessable_entity }
       end

@@ -714,9 +714,9 @@ class ApiController < ApplicationController
      @room = Room.find(params[:room_id])
      respond_to do |format|
        if @room.update_attribute(:public, FALSE)
-         format.json { render :json => "success", :status => 200 }
+         format.json { render :json => @room.public, :status => 200 }
        else
-         format.json { render :json => "error", :status => :unprocessable_entity }
+         format.json { render :json => @room.errors, :status => :unprocessable_entity }
        end
      end
    end

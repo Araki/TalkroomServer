@@ -1255,8 +1255,8 @@ class ApiController < ApplicationController
       :port => 587,
       :domain => 'mail.gmail.com',
       :authentication => :plain,
-      :user_name => 'admin@talkroom.co',
-      :password => 'Pairful1001'
+      :user_name => 'araki@shiftage.jp',#'admin@talkroom.co',
+      :password => 'bradpitt'#'Pairful1001'
     }
     
     @inquiry = Inquiry.new

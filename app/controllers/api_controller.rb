@@ -21,7 +21,8 @@ class ApiController < ApplicationController
                                             :send_mail,
                                             :verify_receipt,
                                             :get_point,
-                                            :consume_point
+                                            :consume_point,
+                                            :change_private_room
                                             #:create_account
                                             ]
   
@@ -702,6 +703,22 @@ class ApiController < ApplicationController
         format.json { render :json => @user.errors, :status => :unprocessable_entity }
       end
     end
+   end
+
+  #================================================================
+  #ルームをプライベートに
+  #受け取るクエリ
+  #ルームID：room_id
+  #================================================================
+   def change_private_room
+     @room = Room.find(params[:room_id])
+     respond_to do |format|
+       if @room.update_attribute(:public, FALSE)
+         format.json { render :json => "success", :status => 200 }
+       else
+         format.json { render :json => "error", :status => :unprocessable_entity }
+       end
+     end
    end
     
     

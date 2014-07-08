@@ -25,6 +25,7 @@ Talkroom::Application.routes.draw do
   match "/get_visits" => "api#get_visits"
   match "/get_point" => "api#get_point"
   match "/consume_point" => "api#consume_point"
+  match "/change_private_room" => "api#change_private_room"
   
   match "/update_profile" => "api#update_profile"
   match "/update_detail_profile" => "api#update_detail_profile" 

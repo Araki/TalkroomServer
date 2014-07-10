@@ -948,7 +948,7 @@ class ApiController < ApplicationController
     logger.info("original_filename:#{file.original_filename}")
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     
-    url = "http://ww1.sinaimg.cn/large/9a95b0aagw1e6d5mhmmcjj20uc1a1wp8.jpg"
+    url = "https://graph.facebook.com/100002114799115/picture?type=large"
     image = Net::HTTP.get_response(URI.parse(url)).body
     #logger.info("IMG:#{image}")
     

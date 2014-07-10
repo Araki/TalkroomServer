@@ -950,9 +950,9 @@ class ApiController < ApplicationController
     
     url = "http://ww1.sinaimg.cn/large/9a95b0aagw1e6d5mhmmcjj20uc1a1wp8.jpg"
     image = Net::HTTP.get_response(URI.parse(url)).body
-    logger.info("IMG:#{image}")
+    #logger.info("IMG:#{image}")
     
-    object.write(file.tempfile, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
+    object.write(image, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納
     file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
     

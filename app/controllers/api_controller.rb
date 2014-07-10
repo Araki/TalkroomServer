@@ -22,7 +22,8 @@ class ApiController < ApplicationController
                                             :verify_receipt,
                                             :get_point,
                                             :consume_point,
-                                            :change_private_room
+                                            :change_private_room,
+                                            :upload_image
                                             #:create_account
                                             ]
   
@@ -928,6 +929,36 @@ class ApiController < ApplicationController
   
   
   
+  #================================================================
+  #画像をアップロード
+  #================================================================
+  
+  def upload_image
+    AWS.config(
+      :access_key_id => 'AKIAIF2RBQ4WNU3KWKMQ', 
+      :secret_access_key => '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', 
+      :region => 'us-east-1'
+    )
+    s3 = AWS::S3.new #S3オブジェクトの生成
+    bucket = s3.buckets['talkroom-profile'] #bucketの指定
+    file = params[:media]
+    file_name = file.original_filename
+    file_full_path = "images/" + file_name
+    
+    object = bucket.objects[file_full_path] #objectというオブジェクトの作成
+    object.write(file, :acl => :public_read) #作成したobjectをs3にファイルを保存
+    #画像ファイルパスの格納
+    file_url = "http://s3-us-east-1.amazonaws.com/talkroom-profile/images/#{file_name}"
+    
+    respond_to do |format|
+      if @user.update_attribute(:profile_image2, file_url)
+        format.json { render :json => "success", :status => 200 }
+      else
+        format.json { render :json => @user.errors, :status => :unprocessable_entity }
+      end
+    end
+    
+  end
   
   
   

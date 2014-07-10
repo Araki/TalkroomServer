@@ -942,6 +942,7 @@ class ApiController < ApplicationController
     s3 = AWS::S3.new #S3オブジェクトの生成
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
     file = params[:media]
+    logger.info("Params[:media]:"#{params[:media]})
     file_name = file.original_filename
     file_full_path = "images/" + file_name
     logger.info("original_filename:#{file.original_filename}")

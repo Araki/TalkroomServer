@@ -948,7 +948,7 @@ class ApiController < ApplicationController
     logger.info("original_filename:#{file.original_filename}")
     
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
-    url = "https://graph.facebook.com/100002114799115/picture?type=large
+    url = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xpa1/t1.0-1/s200x200/225678_10150172927029204_5629112_n.jpg
 "
     image = open(url)
     logger.info("IMG:#{image}")

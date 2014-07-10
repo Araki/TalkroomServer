@@ -950,7 +950,7 @@ class ApiController < ApplicationController
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     object.write(file.tempfile, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納
-    file_url = "http://s3-us-east-1.amazonaws.com/talkroom-profile/images/#{file_name}"
+    file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
     
     respond_to do |format|
       if @user.update_attribute(:profile_image2, file_url)

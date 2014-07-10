@@ -941,12 +941,13 @@ class ApiController < ApplicationController
     )
     s3 = AWS::S3.new #S3オブジェクトの生成
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
+    logger.info("original_filename:#{file.original_filename}")
     file = params[:media]
     file_name = file.original_filename
     file_full_path = "images/" + file_name
     
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
-    object.write(file, :acl => :public_read) #作成したobjectをs3にファイルを保存
+    object.write(file, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納
     file_url = "http://s3-us-east-1.amazonaws.com/talkroom-profile/images/#{file_name}"
     

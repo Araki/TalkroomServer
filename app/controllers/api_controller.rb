@@ -951,7 +951,7 @@ class ApiController < ApplicationController
     image = URI.parse("https://graph.facebook.com/100002114799115/picture?type=large
 ")
     logger.info("IMG:#{image}")
-    object.write(image), {:acl => :public_read}) #作成したobjectをs3にファイルを保存
+    object.write(image, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納
     file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
     

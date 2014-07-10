@@ -946,13 +946,15 @@ class ApiController < ApplicationController
     file_name = file.original_filename
     file_full_path = "images/" + file_name
     logger.info("original_filename:#{file.original_filename}")
-    
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
+    
     url = "https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xpa1/t1.0-1/s200x200/225678_10150172927029204_5629112_n.jpg
 "
-    image = open(url)
-    logger.info("IMG:#{image}")
-    object.write(image, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
+    open(url) do |data|
+      logger.info("IMG:#{data}")
+    end
+    
+    object.write(file.tempfile, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納
     file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
     

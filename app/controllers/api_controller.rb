@@ -949,8 +949,10 @@ class ApiController < ApplicationController
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     
     url = "https://graph.facebook.com/100002114799115/picture?type=large"
-    image = Net::HTTP.get_response(URI.parse(url)).body
     #logger.info("IMG:#{image}")
+    redirect_url = valid_url(url, 2)
+    image = Net::HTTP.get_response(URI.parse(redirect_url)).body
+    
     
     object.write(image, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納
@@ -963,7 +965,19 @@ class ApiController < ApplicationController
         format.json { render :json => @user.errors, :status => :unprocessable_entity }
       end
     end
-    
+  end
+  
+  def valid_url url, limit
+    raise ArgumentError, 'HTTP redirect too deep' if limit <= 0
+    response = Net::HTTP.get_response(URI.parse(url))
+    case response
+    when Net::HTTPSuccess
+      url
+    when Net::HTTPRedirection
+      valid_url response['location'], limit - 1
+    else
+      raise ItemNotFound
+    end
   end
   
   

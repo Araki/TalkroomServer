@@ -23,7 +23,8 @@ class ApiController < ApplicationController
                                             :get_point,
                                             :consume_point,
                                             :change_private_room,
-                                            :upload_image
+                                            :upload_image,
+                                            :upload_fb_image
                                             #:create_account
                                             ]
   
@@ -981,6 +982,44 @@ class ApiController < ApplicationController
         else
           format.json { render :json => @user.errors, :status => :unprocessable_entity }
         end
+      end
+    end
+  end
+  
+  #================================================================
+  #Facebookのプロフィール画像を登録する
+  #================================================================
+  
+  def upload_fb_image
+    AWS.config(
+      :access_key_id => 'AKIAIF2RBQ4WNU3KWKMQ', 
+      :secret_access_key => '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', 
+      :region => 'us-east-1'
+    )
+    s3 = AWS::S3.new #S3オブジェクトの生成
+    bucket = s3.buckets['talkroom-profile'] #bucketの指定
+    
+    #Facebookから大きいプロフィール画像を取得
+    url = "https://graph.facebook.com/" + @user.fb_id + "/picture?type=large"
+    #logger.info("IMG:#{image}")
+    redirect_url = valid_url(url, 2)
+    
+    file = Net::HTTP.get_response(URI.parse(redirect_url)).body
+    #logger.info("Params[:media]:#{file.tempfile}")
+    file_name = file.original_filename
+    file_full_path = "images/" + file_name
+    logger.info("original_filename:#{file.original_filename}")
+    object = bucket.objects[file_full_path] #objectというオブジェクトの作成
+    
+    object.write(file, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
+    #画像ファイルパスの格納
+    file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
+    
+    respond_to do |format|
+      if @user.update_attributes(:profile_image1 => file_url)
+        format.json { render :json => "success", :status => 200 }
+      else
+        format.json { render :json => @user.errors, :status => :unprocessable_entity }
       end
     end
   end

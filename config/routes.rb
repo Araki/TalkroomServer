@@ -34,6 +34,7 @@ Talkroom::Application.routes.draw do
   match "/create_account" => "api#create_account"
   match "/create_friends" => "api#create_friends"
   match "/upload_image" => "api#upload_image"
+  match "/upload_fb_image" => "api#upload_fb_image"
   
   match "/check_login" => "api#check_login"
   match "/car_pointback" => "api#car_pointback"

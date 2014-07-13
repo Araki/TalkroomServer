@@ -995,10 +995,8 @@ class ApiController < ApplicationController
     #Facebookから大きいプロフィール画像を取得
     
     if usr != nil then
-      logger.info("#NOT NIL")
       url = "https://graph.facebook.com/" + usr.fb_uid + "/picture?type=large"
     else
-      logger.info("#NIL")
       url = "https://graph.facebook.com/" + @user.fb_uid + "/picture?type=large"
     end
     #logger.info("IMG:#{image}")
@@ -1008,10 +1006,8 @@ class ApiController < ApplicationController
     logger.info("filetype:#{filetype}")
     file = Net::HTTP.get_response(URI.parse(redirect_url)).body
     if usr != nil then
-      logger.info("##NOT NIL")
       file_name = format("%09d", usr.id).to_s + "-profile_image1" + filetype 
     else
-      logger.info("##NIL")
       file_name = format("%09d", @user.id).to_s + "-profile_image1" + filetype
     end
     file_full_path = "images/" + file_name
@@ -1021,11 +1017,8 @@ class ApiController < ApplicationController
     #画像ファイルパスの格納
     file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
     if usr != nil then
-      logger.info("###NOT NIL")
-      logger.info("FILE_URL:#{file_url}")
-      return file_url
+      usr.update_attributes(:profile_image1 => file_url)
     else
-      logger.info("###NIL")
       respond_to do |format|
         if @user.update_attributes(:profile_image1 => file_url)
           format.json { render :json => "success", :status => 200 }
@@ -1097,7 +1090,7 @@ class ApiController < ApplicationController
     
       respond_to do |format|
         if @list.save
-          logger.info("FILE_URL:#{upload_fb_image(@list)}")
+          upload_fb_image(@list)
           format.json { render :json => @list, :status => 200 }
         else
           format.json { render :json => @list.errors, :status => :unprocessable_entity }

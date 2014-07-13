@@ -996,7 +996,7 @@ class ApiController < ApplicationController
     redirect_url = valid_url(url, 2)
     
     file = Net::HTTP.get_response(URI.parse(redirect_url)).body
-    file_name = @user.id + "-" + @user.fb_uid + ".jpg"
+    file_name = @user.id.to_s + "-" + @user.fb_uid + ".jpg"
     file_full_path = "images/" + file_name
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     

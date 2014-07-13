@@ -997,10 +997,10 @@ class ApiController < ApplicationController
     #logger.info("IMG:#{image}")
     redirect_url = valid_url(url, 2)
     strAry = redirect_url.split(".")
-    filetype = "." + strAry[1]
-    logger.info("strAry[0]:#{strAry[0]}\nstrAry[1]:#{strAry[1]}")
+    filetype = "." + strAry[strAry.length - 1]
+    logger.info("filetype:#{filetype}")
     file = Net::HTTP.get_response(URI.parse(redirect_url)).body
-    file_name = format("%09d", @user.id).to_s + "-" + params[:which_image] + filetype
+    file_name = format("%09d", @user.id).to_s + "-profile_image1" + filetype
     file_full_path = "images/" + file_name
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     

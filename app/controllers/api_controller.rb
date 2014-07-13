@@ -996,10 +996,8 @@ class ApiController < ApplicationController
     redirect_url = valid_url(url, 2)
     
     file = Net::HTTP.get_response(URI.parse(redirect_url)).body
-    #logger.info("Params[:media]:#{file.tempfile}")
-    file_name = file.original_filename
+    file_name = @user.id + "-" + @user.fb_uid + ".jpg"
     file_full_path = "images/" + file_name
-    logger.info("original_filename:#{file.original_filename}")
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     
     object.write(file, {:acl => :public_read}) #作成したobjectをs3にファイルを保存

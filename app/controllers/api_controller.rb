@@ -998,6 +998,7 @@ class ApiController < ApplicationController
     redirect_url = valid_url(url, 2)
     strAry = redirect_url.split(".")
     filetype = "." + strAry[1]
+    logger.info("strAry[0]:#{strAry[0]}\nstrAry[1]:#{strAry[1]}")
     file = Net::HTTP.get_response(URI.parse(redirect_url)).body
     file_name = format("%09d", @user.id).to_s + "-" + params[:which_image] + filetype
     file_full_path = "images/" + file_name

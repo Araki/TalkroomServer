@@ -983,7 +983,7 @@ class ApiController < ApplicationController
   #Facebookのプロフィール画像を登録する
   #================================================================
   
-  def upload_fb_image
+  def upload_fb_image usr
     AWS.config(
       :access_key_id => 'AKIAIF2RBQ4WNU3KWKMQ', 
       :secret_access_key => '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', 
@@ -993,26 +993,37 @@ class ApiController < ApplicationController
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
     
     #Facebookから大きいプロフィール画像を取得
-    url = "https://graph.facebook.com/" + @user.fb_uid + "/picture?type=large"
+    if usr != nil then
+      url = "https://graph.facebook.com/" + usr.fb_uid + "/picture?type=large"
+    else
+      url = "https://graph.facebook.com/" + @user.fb_uid + "/picture?type=large"
+    end
     #logger.info("IMG:#{image}")
     redirect_url = valid_url(url, 2)
     strAry = redirect_url.split(".")
     filetype = "." + strAry[strAry.length - 1]
     logger.info("filetype:#{filetype}")
     file = Net::HTTP.get_response(URI.parse(redirect_url)).body
-    file_name = format("%09d", @user.id).to_s + "-profile_image1" + filetype
+    if usr != nil then
+      file_name = format("%09d", usr.id).to_s + "-profile_image1" + filetype 
+    else
+      file_name = format("%09d", @user.id).to_s + "-profile_image1" + filetype
+    end
     file_full_path = "images/" + file_name
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     
     object.write(file, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納
     file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
-    
-    respond_to do |format|
-      if @user.update_attributes(:profile_image1 => file_url)
-        format.json { render :json => "success", :status => 200 }
-      else
-        format.json { render :json => @user.errors, :status => :unprocessable_entity }
+    if usr != nil then
+      file_url
+    else
+      respond_to do |format|
+        if @user.update_attributes(:profile_image1 => file_url)
+          format.json { render :json => "success", :status => 200 }
+        else
+          format.json { render :json => @user.errors, :status => :unprocessable_entity }
+        end
       end
     end
   end
@@ -1067,7 +1078,7 @@ class ApiController < ApplicationController
       @list.age = params[:age]
       @list.purpose = params[:purpose]
       @list.area = params[:area]
-      @list.profile_image1 = params[:profile_image1]
+      @list.profile_image1 = upload_fb_image(@list)#params[:profile_image1]
       @list.profile = params[:profile]
       @list.point = params[:point]
       @list.last_logined = Time.now.utc
@@ -1077,8 +1088,7 @@ class ApiController < ApplicationController
       @list.app_token = params[:fb_uid] + "-" + Digest::MD5.hexdigest(params[:fb_uid] + Time.now.to_s)
     
       respond_to do |format|
-        if @list.save
-          upload_fb_image()     
+        if @list.save     
           format.json { render :json => @list, :status => 200 }
         else
           format.json { render :json => @list.errors, :status => :unprocessable_entity }

@@ -1071,17 +1071,15 @@ class ApiController < ApplicationController
       logger.info(params[:point])
         
       @list = List.new
-      logger.info("IDIDID:#{@list.id}")
       @list.channel = params[:channel]
       @list.fb_uid = params[:fb_uid]
-      logger.info("FBUID#{@list.fb_uid}")
       @list.nickname = params[:nickname]
       @list.gender = params[:gender]
       @list.email = params[:email]
       @list.age = params[:age]
       @list.purpose = params[:purpose]
       @list.area = params[:area]
-      @list.profile_image1 = upload_fb_image(@list)#params[:profile_image1]
+      @list.profile_image1 = params[:profile_image1]
       @list.profile = params[:profile]
       @list.point = params[:point]
       @list.last_logined = Time.now.utc
@@ -1091,7 +1089,8 @@ class ApiController < ApplicationController
       @list.app_token = params[:fb_uid] + "-" + Digest::MD5.hexdigest(params[:fb_uid] + Time.now.to_s)
     
       respond_to do |format|
-        if @list.save     
+        if @list.save
+          upload_fb_image(@list)
           format.json { render :json => @list, :status => 200 }
         else
           format.json { render :json => @list.errors, :status => :unprocessable_entity }

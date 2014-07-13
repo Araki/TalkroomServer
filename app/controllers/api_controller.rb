@@ -949,18 +949,9 @@ class ApiController < ApplicationController
     logger.info("original_filename:#{file.original_filename}")
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     
-    #Facebook用始まり============================
-    url = "https://graph.facebook.com/721214203/picture?type=large"
-    #logger.info("IMG:#{image}")
-    redirect_url = valid_url(url, 2)
-    image = Net::HTTP.get_response(URI.parse(redirect_url)).body
-    #Facebook用終わり============================
-    
-    object.write(image, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
+    object.write(file.tempfile, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納
     file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
-    
-    
     
     respond_to do |format|
       case params[:which_image]
@@ -1000,7 +991,7 @@ class ApiController < ApplicationController
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
     
     #Facebookから大きいプロフィール画像を取得
-    url = "https://graph.facebook.com/" + @user.fb_id + "/picture?type=large"
+    url = "https://graph.facebook.com/" + @user.fb_uid + "/picture?type=large"
     #logger.info("IMG:#{image}")
     redirect_url = valid_url(url, 2)
     

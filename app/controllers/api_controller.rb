@@ -946,12 +946,7 @@ class ApiController < ApplicationController
     file = params[:media]
     strAry = file.original_filename.split(".")
     file_type = "." + strAry[1]
-    utc = Time.now.utc
-    utcArray = utc.to_s.split(" ")
-    timeAry = utcAry[0].split("-")
-    time = timeAry[0] + timeAry[1] + timeAry[2]
-    logger.info("Time:#{time}")
-    file_name = @user.id.to_s + "-" + @user.fb_uid + "-" + params[:which_image] + file_type
+    file_name = format("%09d", @user.id).to_s + "-" + params[:which_image] + file_type
     file_full_path = "images/" + file_name
     logger.info("original_filename:#{file.original_filename}")
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
@@ -1001,9 +996,10 @@ class ApiController < ApplicationController
     url = "https://graph.facebook.com/" + @user.fb_uid + "/picture?type=large"
     #logger.info("IMG:#{image}")
     redirect_url = valid_url(url, 2)
-    
+    strAry = redirect_url.split(".")
+    filetype = "." + strAry[1]
     file = Net::HTTP.get_response(URI.parse(redirect_url)).body
-    file_name = @user.id.to_s + "-" + @user.fb_uid + "-profile_image1.jpg"
+    file_name = format("%09d", @user.id).to_s + "-" + params[:which_image] + filetype
     file_full_path = "images/" + file_name
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     

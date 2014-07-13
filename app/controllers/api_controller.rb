@@ -1017,7 +1017,8 @@ class ApiController < ApplicationController
     #画像ファイルパスの格納
     file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
     if usr != nil then
-      file_url
+      logger.info("FILE_URL:#{file_url}")
+      return file_url
     else
       respond_to do |format|
         if @user.update_attributes(:profile_image1 => file_url)

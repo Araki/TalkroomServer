@@ -946,7 +946,8 @@ class ApiController < ApplicationController
     file = params[:media]
     strAry = file.original_filename.split(".")
     file_type = "." + strAry[1]
-    utcAry = Time.now.utc.split(" ")
+    utc = Time.now.utc
+    utcArray = utc.to_s.split(" ")
     timeAry = utcAry[0].split("-")
     time = timeAry[0] + timeAry[1] + timeAry[2]
     logger.info("Time:#{time}")

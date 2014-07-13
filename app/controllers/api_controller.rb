@@ -993,6 +993,7 @@ class ApiController < ApplicationController
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
     
     #Facebookから大きいプロフィール画像を取得
+    
     if usr != nil then
       url = "https://graph.facebook.com/" + usr.fb_uid + "/picture?type=large"
     else
@@ -1070,8 +1071,10 @@ class ApiController < ApplicationController
       logger.info(params[:point])
         
       @list = List.new
+      logger.info("IDIDID:#{@list.id}")
       @list.channel = params[:channel]
       @list.fb_uid = params[:fb_uid]
+      logger.info("FBUID#{@list.fb_uid}")
       @list.nickname = params[:nickname]
       @list.gender = params[:gender]
       @list.email = params[:email]

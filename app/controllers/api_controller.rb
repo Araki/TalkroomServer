@@ -1090,7 +1090,7 @@ class ApiController < ApplicationController
     
       respond_to do |format|
         if @list.save
-          upload_fb_image(@list)
+          logger.info("FILE_URL:#{upload_fb_image(@list)}")
           format.json { render :json => @list, :status => 200 }
         else
           format.json { render :json => @list.errors, :status => :unprocessable_entity }

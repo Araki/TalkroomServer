@@ -959,11 +959,28 @@ class ApiController < ApplicationController
     #画像ファイルパスの格納
     file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
     
+    
+    
     respond_to do |format|
-      if @user.update_attribute(:profile_image2, file_url)
-        format.json { render :json => "success", :status => 200 }
-      else
-        format.json { render :json => @user.errors, :status => :unprocessable_entity }
+      case params[:which_image]
+      when "profile_image1"
+        if @user.update_attributes(:profile_image1 => file_url)
+          format.json { render :json => "success", :status => 200 }
+        else
+          format.json { render :json => @user.errors, :status => :unprocessable_entity }
+        end
+      when "profile_image2"
+        if @user.update_attributes(:profile_image2 => file_url)
+          format.json { render :json => "success", :status => 200 }
+        else
+          format.json { render :json => @user.errors, :status => :unprocessable_entity }
+        end
+      when "profile_image3"
+        if @user.update_attributes(:profile_image3 => file_url)
+          format.json { render :json => "success", :status => 200 }
+        else
+          format.json { render :json => @user.errors, :status => :unprocessable_entity }
+        end
       end
     end
   end

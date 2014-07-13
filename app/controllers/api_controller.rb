@@ -1077,7 +1077,8 @@ class ApiController < ApplicationController
       @list.app_token = params[:fb_uid] + "-" + Digest::MD5.hexdigest(params[:fb_uid] + Time.now.to_s)
     
       respond_to do |format|
-        if @list.save       
+        if @list.save
+          upload_fb_image()     
           format.json { render :json => @list, :status => 200 }
         else
           format.json { render :json => @list.errors, :status => :unprocessable_entity }

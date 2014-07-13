@@ -946,7 +946,9 @@ class ApiController < ApplicationController
     file = params[:media]
     strAry = file.original_filename.split(".")
     file_type = "." + strAry[1]
-    time = Time.now.utc
+    utcAry = Time.now.utc.split(" ")
+    timeAry = utcAry[0].split("-")
+    time = timeAry[0] + timeAry[1] + timeAry[2]
     logger.info("Time:#{time}")
     file_name = @user.id.to_s + "-" + @user.fb_uid + "-" + params[:which_image] + file_type
     file_full_path = "images/" + file_name

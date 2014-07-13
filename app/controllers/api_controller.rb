@@ -942,9 +942,11 @@ class ApiController < ApplicationController
     )
     s3 = AWS::S3.new #S3オブジェクトの生成
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
+    
     file = params[:media]
-    logger.info("Params[:media]:#{file.tempfile}")
-    file_name = file.original_filename
+    strAry = file.original_filename.split(".")
+    file_type = "." + strAry[1]
+    file_name = @user.id.to_s + "-" + @user.fb_uid + "-" + params[:which_image] + file_type
     file_full_path = "images/" + file_name
     logger.info("original_filename:#{file.original_filename}")
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
@@ -996,7 +998,7 @@ class ApiController < ApplicationController
     redirect_url = valid_url(url, 2)
     
     file = Net::HTTP.get_response(URI.parse(redirect_url)).body
-    file_name = @user.id.to_s + "-" + @user.fb_uid + ".jpg"
+    file_name = @user.id.to_s + "-" + @user.fb_uid + "-profile_image1.jpg"
     file_full_path = "images/" + file_name
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     

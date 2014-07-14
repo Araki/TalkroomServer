@@ -1071,9 +1071,9 @@ class ApiController < ApplicationController
     width = 200
     height = 200
     logger.info("image_url:#{image_url}")
-    res = open(image_url)
-    if res.content_type =~ /^image/
-      thumb = Magick::Image.from_blob(res.read).shift
+    #res = open(image_url)
+    #if res.content_type =~ /^image/
+      #thumb = Magick::Image.from_blob(res.read).shift
       thumb = Magick::Image.read(image_path).first
     
       if thumb.columns < width or thumb.rows < height
@@ -1094,7 +1094,7 @@ class ApiController < ApplicationController
       logger.info("THUMB_OUT:#{thumb_out}")
       return thumb_out
       
-    end
+    #end
   end
   #============
   

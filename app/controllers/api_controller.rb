@@ -948,10 +948,9 @@ class ApiController < ApplicationController
     file_type = "." + strAry[1]
     file_name = format("%09d", @user.id).to_s + "-" + params[:which_image] + file_type
     file_full_path = "images/" + file_name
-    logger.info("original_filename:#{file.original_filename}")
+    
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
-    logger.info("FILE.TEMPFILE:#{file.tempfile}")
-    object.write(file.tempfile, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
+    object.write(resize_image(file.tempfile.path), {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納
     file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"
     
@@ -999,19 +998,15 @@ class ApiController < ApplicationController
     else
       url = "https://graph.facebook.com/" + @user.fb_uid + "/picture?type=large"
     end
-    #logger.info("IMG:#{image}")
-    redirect_url = valid_url(url, 2)
-    strAry = redirect_url.split(".")
-    filetype = "." + strAry[strAry.length - 1]
-    logger.info("filetype:#{filetype}")
     
-    #file = Net::HTTP.get_response(URI.parse(redirect_url)).body
+    redirect_url = valid_url(url, 2)
+    
     logger.info("redirect_url:#{redirect_url}")
     file = resize_image(redirect_url)
     if usr != nil then
-      file_name = format("%09d", usr.id).to_s + "-profile_image1" + filetype 
+      file_name = format("%09d", usr.id).to_s + "-profile_image1.png"
     else
-      file_name = format("%09d", @user.id).to_s + "-profile_image1" + filetype
+      file_name = format("%09d", @user.id).to_s + "-profile_image1.png"
     end
     file_full_path = "images/" + file_name
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
@@ -1045,60 +1040,37 @@ class ApiController < ApplicationController
     end
   end
   
-  #============
+  #================================================================
+  #200*200の画像を生成。正方形でない画像は余白を付加
+  #================================================================
   def resize_image url
-    require 'RMagick' # gem install rmagick
-  
-    #def shrink_to_fill(image, width, height)
-    #  image.resize_to_fill!(width, height)
-    #  image
-    #end
+    require 'RMagick' 
     
-    #def cover_white(image, width, height)
-    #  new_width = (image.columns < width) ? image.columns : width
-    #  new_height = (image.rows < height) ? image.rows : height
-    
-    #  image.resize_to_fit!(new_width, new_height)
-    #  image_out = Magick::Image.new(width, height)
-    #  image_out.background_color = '#ffffff'
-    #  image_out.composite!(image, Magick::CenterGravity, Magick::OverCompositeOp)
-    #  image_out
-    #end
-    
-    
-    # flickr上のクリエティブ・コモンズの画像
     image_url = url
     width = 200
     height = 200
-    logger.info("image_url:#{image_url}")
-    #res = open(image_url)
-    #if res.content_type =~ /^image/
-      #thumb = Magick::Image.from_blob(res.read).shift
-      thumb = Magick::Image.read(image_url).first
     
-      if thumb.columns < width or thumb.rows < height
-        #thumb_out = cover_white(thumb, width, height)
-        new_width = (thumb.columns < width) ? thumb.columns : width
-        new_height = (thumb.rows < height) ? thumb.rows : height
-      
-        thumb.resize_to_fit!(new_width, new_height)
-        image_out = Magick::Image.new(width, height)
-        image_out.background_color = '#ffffff'
-        image_out.composite!(thumb, Magick::CenterGravity, Magick::OverCompositeOp)
-        thumb_out = image_out
-      else
-        thumb_out = thumb.resize_to_fill!(width, height)
-      end
-      
-      path = './tmp/temp.png'
-      thumb_out.write(path)
-      #open("./out_thumb.png", 'w').print thumb_out.to_blob
-      logger.info("PATH:#{path}")
-      file = File.open(path, "rb") {|f| f.read }
-      logger.info("FILE:#{file}")
-      return file
-      
-    #end
+    thumb = Magick::Image.read(image_url).first
+  
+    if thumb.columns < width or thumb.rows < height
+      new_width = (thumb.columns < width) ? thumb.columns : width
+      new_height = (thumb.rows < height) ? thumb.rows : height
+    
+      thumb.resize_to_fit!(new_width, new_height)
+      image_out = Magick::Image.new(width, height)
+      image_out.background_color = '#ffffff'
+      image_out.composite!(thumb, Magick::CenterGravity, Magick::OverCompositeOp)
+      thumb_out = image_out
+    else
+      thumb_out = thumb.resize_to_fill!(width, height)
+    end
+    
+    path = './tmp/temp.png'
+    thumb_out.write(path)
+    
+    file = File.open(path, "rb") {|f| f.read }
+    
+    return file
   end
   #============
   

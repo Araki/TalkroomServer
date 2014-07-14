@@ -983,7 +983,7 @@ class ApiController < ApplicationController
   #Facebookのプロフィール画像を登録する
   #================================================================
   
-  def upload_fb_image #usr
+  def upload_fb_image usr=nil
     AWS.config(
       :access_key_id => 'AKIAIF2RBQ4WNU3KWKMQ', 
       :secret_access_key => '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', 

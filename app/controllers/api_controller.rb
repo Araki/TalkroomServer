@@ -1004,7 +1004,9 @@ class ApiController < ApplicationController
     strAry = redirect_url.split(".")
     filetype = "." + strAry[strAry.length - 1]
     logger.info("filetype:#{filetype}")
-    file = Net::HTTP.get_response(URI.parse(redirect_url)).body
+    
+    #file = Net::HTTP.get_response(URI.parse(redirect_url)).body
+    file = resize_image(redirect_url)
     if usr != nil then
       file_name = format("%09d", usr.id).to_s + "-profile_image1" + filetype 
     else
@@ -1042,7 +1044,57 @@ class ApiController < ApplicationController
     end
   end
   
+  #============
+  def resize_image url
+    require 'rmagick' # gem install rmagick
   
+    #def shrink_to_fill(image, width, height)
+    #  image.resize_to_fill!(width, height)
+    #  image
+    #end
+    
+    #def cover_white(image, width, height)
+    #  new_width = (image.columns < width) ? image.columns : width
+    #  new_height = (image.rows < height) ? image.rows : height
+    
+    #  image.resize_to_fit!(new_width, new_height)
+    #  image_out = Magick::Image.new(width, height)
+    #  image_out.background_color = '#ffffff'
+    #  image_out.composite!(image, Magick::CenterGravity, Magick::OverCompositeOp)
+    #  image_out
+    #end
+    
+    # flickr上のクリエティブ・コモンズの画像
+    image_url = url
+    width = 200
+    height = 200
+    
+    res = open(image_url)
+    if res.content_type =~ /^image/
+      thumb = Magick::Image.from_blob(res.read).shift
+      thumb = Magick::Image.read(image_path).first
+    
+      if thumb.columns < width or thumb.rows < height
+        #thumb_out = cover_white(thumb, width, height)
+        new_width = (thumb.columns < width) ? thumb.columns : width
+        new_height = (thumb.rows < height) ? thumb.rows : height
+      
+        thumb.resize_to_fit!(new_width, new_height)
+        image_out = Magick::Image.new(width, height)
+        image_out.background_color = '#ffffff'
+        image_out.composite!(thumb, Magick::CenterGravity, Magick::OverCompositeOp)
+        thumb_out = image_out
+      else
+        thumb_out = thumb.resize_to_fill!(width, height)
+      end
+    
+      #open("./out_thumb.png", 'w').print thumb_out.to_blob
+      logger.info("THUMB_OUT:#{thumb_out}")
+      return thumb_out
+      
+    #end
+  end
+  #============
   
   #================================================================
   #アカウントを作成

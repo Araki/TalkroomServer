@@ -1046,7 +1046,7 @@ class ApiController < ApplicationController
   
   #============
   def resize_image url
-    require 'rmagick' # gem install rmagick
+    require 'RMagick' # gem install rmagick
   
     #def shrink_to_fill(image, width, height)
     #  image.resize_to_fill!(width, height)

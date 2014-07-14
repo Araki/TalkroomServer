@@ -1089,10 +1089,12 @@ class ApiController < ApplicationController
       else
         thumb_out = thumb.resize_to_fill!(width, height)
       end
-    
+      
+      path = './tmp/temp.png'
+      thumb_out.write(path)
       #open("./out_thumb.png", 'w').print thumb_out.to_blob
-      logger.info("THUMB_OUT.to_blob:#{thumb_out.to_blob}")
-      return thumb_out.to_blob
+      logger.info("PATH:#{path}")
+      return path
       
     #end
   end

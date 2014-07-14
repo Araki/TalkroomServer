@@ -1006,6 +1006,7 @@ class ApiController < ApplicationController
     logger.info("filetype:#{filetype}")
     
     #file = Net::HTTP.get_response(URI.parse(redirect_url)).body
+    logger.info("redirect_url:#{redirect_url}")
     file = resize_image(redirect_url)
     if usr != nil then
       file_name = format("%09d", usr.id).to_s + "-profile_image1" + filetype 
@@ -1069,7 +1070,7 @@ class ApiController < ApplicationController
     image_url = url
     width = 200
     height = 200
-    
+    logger.info("image_url:#{image_url}")
     res = open(image_url)
     if res.content_type =~ /^image/
       thumb = Magick::Image.from_blob(res.read).shift

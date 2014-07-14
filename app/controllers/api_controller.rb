@@ -950,7 +950,7 @@ class ApiController < ApplicationController
     file_full_path = "images/" + file_name
     logger.info("original_filename:#{file.original_filename}")
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
-    
+    logger.info("FILE.TEMPFILE:#{file.tempfile}")
     object.write(file.tempfile, {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納
     file_url = "https://s3-ap-northeast-1.amazonaws.com/talkroom-profile/images/#{file_name}"

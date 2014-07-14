@@ -1093,7 +1093,7 @@ class ApiController < ApplicationController
       logger.info("THUMB_OUT:#{thumb_out}")
       return thumb_out
       
-    #end
+    end
   end
   #============
   

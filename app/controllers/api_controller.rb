@@ -1094,7 +1094,9 @@ class ApiController < ApplicationController
       thumb_out.write(path)
       #open("./out_thumb.png", 'w').print thumb_out.to_blob
       logger.info("PATH:#{path}")
-      return path
+      file = File.open(path, "rb") {|f| f.read }
+      logger.info("FILE:#{file}")
+      return file
       
     #end
   end

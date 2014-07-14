@@ -1074,7 +1074,7 @@ class ApiController < ApplicationController
     #res = open(image_url)
     #if res.content_type =~ /^image/
       #thumb = Magick::Image.from_blob(res.read).shift
-      thumb = Magick::Image.read(image_path).first
+      thumb = Magick::Image.read(image_url).first
     
       if thumb.columns < width or thumb.rows < height
         #thumb_out = cover_white(thumb, width, height)

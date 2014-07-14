@@ -1091,8 +1091,8 @@ class ApiController < ApplicationController
       end
     
       #open("./out_thumb.png", 'w').print thumb_out.to_blob
-      logger.info("THUMB_OUT:#{thumb_out}")
-      return thumb_out
+      logger.info("THUMB_OUT.to_blob:#{thumb_out.to_blob}")
+      return thumb_out.to_blob
       
     #end
   end

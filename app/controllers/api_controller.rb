@@ -670,6 +670,8 @@ class ApiController < ApplicationController
     
     logger.info("VAL:#{val[0]}")
     logger.info("ROOM_ID:#{val[0]['room_id']}")
+    logger.info('ROOM_ID:#{val[0]["room_id"]}')
+    logger.info("ROOM_ID:#{val[0].room_id}")
       
     respond_to do |format|
       format.json { render :json => val }

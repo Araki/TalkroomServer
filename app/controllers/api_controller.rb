@@ -575,7 +575,7 @@ class ApiController < ApplicationController
                     female_messages[:body].as('sendto_message')
                     ).
             where(male_lists[:id].eq(params[:user_id]).or(female_lists[:id].eq(params[:user_id]))).
-            where(male_lists[:id].not_eq(@user.id).and(female_lists[:id].not_eq(@user.id))).
+            #where(male_lists[:id].not_eq(@user.id).and(female_lists[:id].not_eq(@user.id))).
             order(rooms[:updated_at].desc)  
             
     sql = query.to_sql

@@ -668,14 +668,18 @@ class ApiController < ApplicationController
       })
     end
     
-    logger.info("VAL:#{val[0]}")
-    logger.info("ROOM_ID:#{val[0]['room_id']}")
-    logger.info('ROOM_ID:#{val[0]["room_id"]}')
     logger.info("ROOM_ID:#{val[0][:room_id]}")
     
+    @room = Room.find(val[0][:room_id])
+    vals = {
+      'room_id' => @room.id,
+      'public' => @room.public,
+      'message_count' => @room.message_number,
+      'messages' => val
+    }
       
     respond_to do |format|
-      format.json { render :json => val }
+      format.json { render :json => vals }
     end
   end
   

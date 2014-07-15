@@ -667,6 +667,9 @@ class ApiController < ApplicationController
         :min => sprintf('%02d', result["created_at"].min)
       })
     end
+    
+    logger.info("VAL:#{val[0]}")
+    logger.info("ROOM_ID:#{val[0]['room_id']}")
       
     respond_to do |format|
       format.json { render :json => val }

@@ -300,8 +300,8 @@ class ApiController < ApplicationController
             ).
             #where(messages[:room_id].not_in(sendtoLists)). #自分宛てに送られたメッセージがないルーム
             #where(messages[:sendfrom_list_id].eq(@user.id)).
-            rooms[:male_last_message].eq(nil).or(rooms[:female_last_message].eq(nil)).
-            messages[:sendfrom_list_id].eq(@user.id).or(messages[:sendto_list_id].eq(@user.id)).
+            where(rooms[:male_last_message].eq(nil).or(rooms[:female_last_message].eq(nil))).
+            where(messages[:sendfrom_list_id].eq(@user.id).or(messages[:sendto_list_id].eq(@user.id))).
             group(messages[:room_id]).
             order(messages[:id].desc)
             

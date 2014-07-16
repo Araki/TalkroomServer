@@ -298,8 +298,10 @@ class ApiController < ApplicationController
                     rooms[:public],
                     rooms[:updated_at]
             ).
-            where(messages[:room_id].not_in(sendtoLists)).
-            where(messages[:sendfrom_list_id].eq(@user.id)).
+            #where(messages[:room_id].not_in(sendtoLists)). #自分宛てに送られたメッセージがないルーム
+            #where(messages[:sendfrom_list_id].eq(@user.id)).
+            rooms[:male_last_message].eq(nil).or(rooms[:female_last_message].eq(nil)).
+            messages[:sendfrom_list_id].eq(@user.id).or(messages[:sendto_list_id].eq(@user.id)).
             group(messages[:room_id]).
             order(messages[:id].desc)
             
@@ -315,9 +317,17 @@ class ApiController < ApplicationController
     #ハッシュ配列を整形
     results.each do |result|
       nickname, profile_image, profile = nil
-      obj = List.select("id, nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
+      if result["sendfrom_list_id"] == @user.id then
+        obj = List.select("id, nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
+        type = "sent" 
+      else
+        obj = List.select("id, nickname, profile_image1, profile").where('id = ?', result["sendfrom_list_id"]).first
+        type = "received"
+      end
+      
       val.push({
-        :sendto_id => obj["id"],
+        :type => type,
+        :user_id => obj["id"],
         :nickname => obj["nickname"], 
         :profile_image => obj["profile_image1"], 
         :profile => obj["profile"], 

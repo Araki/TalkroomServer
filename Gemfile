@@ -40,7 +40,7 @@ end
 group :production do
   #gem 'mysql'#, '2.9.1'
   gem 'mysql2'#, "~> 0.3.11"
-  
+  gem 'newrelic_rpm'
   #jdbcmysql削除
   #gem "activerecord-jdbcmysql-adapter"
   gem 'therubyracer-heroku', '0.8.1.pre3' # you will need this too

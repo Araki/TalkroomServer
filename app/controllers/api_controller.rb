@@ -5,7 +5,6 @@ class ApiController < ApplicationController
   #   認証を終えると変数 @user にユーザ情報が格納されるため、各処理で利用できる
   #   例) before_filter :check_app_token, :only => [:create_message, :create_friends]
   before_filter :check_app_token, :only => [:example_token,
-                                            :get_all_users,
                                             :get_recent_rooms,
                                             :get_room_summary_data,
                                             :get_search_users,
@@ -27,38 +26,8 @@ class ApiController < ApplicationController
                                             :upload_fb_image
                                             #:create_account
                                             ]
-  
-  #before_filter :check_logined
-  #================================================================
-  #登録されているユーザーを取得する（デバッグ用）
-  #================================================================
-  def get_all_users
-    lists = Arel::Table.new(:lists, :as => 'sendto_lists')
-    
-    query = lists.
-            project(lists[:id],lists[:nickname])
-                
-    sql = query.to_sql
-    logger.info(sql)
 
-    results = ActiveRecord::Base.connection.select(sql)
-    
-    val = []
-    
-    #ハッシュ配列を整形
-    results.each do |result|
-      val.push({
-        :id => result["id"],
-        :nickname => result["nickname"]
-      })
-    end
-    
-    respond_to do |format|
-      format.json { render :json => val }
-    end
-  end
-  
-  
+  #before_filter :check_logined
   
   #================================================================
   #のぞくボタンのトップ画面
@@ -1182,6 +1151,7 @@ class ApiController < ApplicationController
   # すでに登録されているときは、認証用のapp_tokenを返却
   #================================================================
   def check_login
+    reward_flag = false;
     logger.info(params[:fb_uid])
     logger.info(params[:access_token])
     
@@ -1209,7 +1179,7 @@ class ApiController < ApplicationController
     end
     
     respond_to do |format|
-      format.json { render :json => {:result => flag, :app_token => app_token, :user_id => user_id} }
+      format.json { render :json => {:result => flag, :app_token => app_token, :user_id => user_id, :reward_flag => reward_flag} }
     end
   end
   

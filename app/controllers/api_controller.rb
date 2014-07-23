@@ -287,10 +287,10 @@ class ApiController < ApplicationController
     results.each do |result|
       nickname, profile_image, profile = nil
       if result["sendfrom_list_id"] == @user.id then
-        obj = List.select("id, nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
+        obj = List.select("id, nickname, age, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
         type = "sent" 
       else
-        obj = List.select("id, nickname, profile_image1, profile").where('id = ?', result["sendfrom_list_id"]).first
+        obj = List.select("id, nickname, age, profile_image1, profile").where('id = ?', result["sendfrom_list_id"]).first
         type = "received"
       end
       
@@ -298,6 +298,7 @@ class ApiController < ApplicationController
         :type => type,
         :user_id => obj["id"],
         :nickname => obj["nickname"], 
+        :age => obj["age"],
         :profile_image => obj["profile_image1"], 
         :profile => obj["profile"], 
         :room_updated => exchangeTime( result["updated_at"].to_time ), 
@@ -364,10 +365,11 @@ class ApiController < ApplicationController
     #ハッシュ配列を整形
     results.each do |result|
       nickname, profile_image, profile = nil
-      obj = List.select("id, nickname, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
+      obj = List.select("id, nickname, age, profile_image1, profile").where('id = ?', result["sendto_list_id"]).first
       val.push({
         :sendto_id => obj["id"],
         :nickname => obj["nickname"], 
+        :age => obj["age"],
         :profile_image => obj["profile_image1"], 
         :profile => obj["profile"], 
         :room_updated => exchangeTime( result["updated_at"].to_time ), 
@@ -399,6 +401,7 @@ class ApiController < ApplicationController
                     lists[:nickname],
                     lists[:profile_image1],
                     lists[:profile],
+                    lists[:age],
                     lists[:area],
                     lists[:purpose],
                     visits[:updated_at]
@@ -419,6 +422,7 @@ class ApiController < ApplicationController
         :nickname => result["nickname"],
         :profile_image1 => result["profile_image1"],
         :profile => result["profile"],
+        :age => result["age"],
         :area => result["area"], 
         :purpose => result["purpose"],
         :updated_at => exchangeTime(result["updated_at"].to_time)

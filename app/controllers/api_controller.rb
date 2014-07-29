@@ -1359,9 +1359,7 @@ class ApiController < ApplicationController
       @ca_reward.commission = params[:commission]
       @ca_reward.aff_id = params[:aff_id]
       @ca_reward.point = params[:point]
-      #@ca_reward.pid = params[:pid]
-      
-      logger.info("CNAME :#{@ca_reward.cname}")
+      @ca_reward.pid = params[:pid]
       
       respond_to do |format|
         if @ca_reward.save       

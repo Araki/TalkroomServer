@@ -11,6 +11,7 @@ class CreateCaRewards < ActiveRecord::Migration
       t.integer :commission
       t.string :aff_id
       t.integer :point
+      t.integer :pid
 
       t.timestamps
     end

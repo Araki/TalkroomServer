@@ -1366,7 +1366,7 @@ class ApiController < ApplicationController
       #                   params[:cid], params[:uid], params[:action_date], params[:pid]).
       #                   exists?
       
-      duplication_flag = CaReward.find(:all).exists?
+      duplication_flag = CaReward.exists?
       logger.info("duplication_flag:#{duplication_flag}")
                       
       respond_to do |format|

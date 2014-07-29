@@ -1361,10 +1361,12 @@ class ApiController < ApplicationController
       @ca_reward.point = params[:point]
       @ca_reward.pid = params[:pid]
       
-      duplication_flag = CaReward.
-                         where('cid = :cid AND list_id = :uid AND action_date = :action_date AND pid = :pid', 
-                         {:cid => params[:cid], :uid => params[:uid], :action_date => params[:action_date], :pid => params[:pid]}).
-                         exists?
+      #duplication_flag = CaReward.
+      #                   where('cid = ? AND list_id = ? AND action_date = ? AND pid = ?', 
+      #                   params[:cid], params[:uid], params[:action_date], params[:pid]).
+      #                   exists?
+      
+      duplication_flag = CaReward.find(:all).exists?
       logger.info("duplication_flag:#{duplication_flag}")
                       
       respond_to do |format|

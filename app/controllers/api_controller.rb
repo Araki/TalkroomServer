@@ -1349,7 +1349,7 @@ class ApiController < ApplicationController
     if remote_ip == "202.234.38.240" || remote_ip =="59.106.126.70" || remote_ip =="59.106.126.73" || remote_ip == "59.106.126.74" then
       logger.info("$$$$$$$$$$$$$$$$$$$$$$$")
       
-      @ca_reward = Ca_reward.new
+      @ca_reward = CaReward.new
       @ca_reward.list_id = params[:uid]
       @ca_reward.cid = params[:cid]
       @ca_reward.cname = params[:cname]

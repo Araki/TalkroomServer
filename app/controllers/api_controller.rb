@@ -1361,15 +1361,13 @@ class ApiController < ApplicationController
       @ca_reward.point = params[:point]
       #@ca_reward.pid = params[:pid]
       
-      logger.info("CA_Reward=#{@ca_reward}")
-    
+      logger.info("CNAME :#{@ca_reward.cname}")
+      
       respond_to do |format|
         if @ca_reward.save       
           format.html { render :text => "OK" }
-          #format.json { render :json => {:body => "OK"}}
         else
           format.html { render :text => "NG" }
-          #format.json { render :json => {:body => "NG"}}
         end
       end
     else

@@ -1356,7 +1356,7 @@ class ApiController < ApplicationController
       @ca_reward.carrier = params[:carrier]
       @ca_reward.click_date = params[:click_date]
       @ca_reward.action_date = params[:action_date]
-      @ca_reward.commision = params[:commission]
+      @ca_reward.commission = params[:commission]
       @ca_reward.aff_id = params[:aff_id]
       @ca_reward.point = params[:point]
       #@ca_reward.pid = params[:pid]

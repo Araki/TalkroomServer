@@ -1350,7 +1350,7 @@ class ApiController < ApplicationController
       logger.info("$$$$$$$$$$$$$$$$$$$$$$$")
       
       @ca_reward = Ca_reward.new
-      @ca_reward.list_id = params[:list_id]
+      @ca_reward.list_id = params[:uid]
       @ca_reward.cid = params[:cid]
       @ca_reward.cname = params[:cname]
       @ca_reward.carrier = params[:carrier]
@@ -1359,14 +1359,17 @@ class ApiController < ApplicationController
       @ca_reward.commision = params[:commision]
       @ca_reward.aff_id = params[:aff_id]
       @ca_reward.point = params[:point]
+      #@ca_reward.pid = params[:pid]
+      
+      logger.info("CA_Reward=#{@ca_reward}")
     
       respond_to do |format|
         if @ca_reward.save       
-          #format.html { render :text => "OK" }
-          format.json { render :json => {:body => "OK"}}
+          format.html { render :text => "OK" }
+          #format.json { render :json => {:body => "OK"}}
         else
-          #format.html { render :text => "NG" }
-          format.json { render :json => {:body => "NG"}}
+          format.html { render :text => "NG" }
+          #format.json { render :json => {:body => "NG"}}
         end
       end
     else

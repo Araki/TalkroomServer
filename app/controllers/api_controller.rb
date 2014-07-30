@@ -1349,18 +1349,7 @@ class ApiController < ApplicationController
     if remote_ip == "202.234.38.240" || remote_ip =="59.106.126.70" || remote_ip =="59.106.126.73" || remote_ip == "59.106.126.74" then
       logger.info("$$$$$$$$$$$$$$$$$$$$$$$")
       
-      @ca_reward = CaReward.new
-      @ca_reward.list_id = params[:uid]
-      @ca_reward.cid = params[:cid]
-      @ca_reward.cname = params[:cname]
-      @ca_reward.carrier = params[:carrier]
-      @ca_reward.click_date = params[:click_date]
-      @ca_reward.action_date = params[:action_date]
-      @ca_reward.commission = params[:commission]
-      @ca_reward.aff_id = params[:aff_id]
-      @ca_reward.point = params[:point]
-      @ca_reward.pid = params[:pid]
-      
+      #重複しているかどうかをチェック。
       duplication_flag = CaReward.
                          #where('cid = ? AND list_id = ? AND action_date = ? AND pid = ?', 
                          #params[:cid].to_i, params[:uid].to_i, params[:action_date], params[:pid].to_i).
@@ -1369,17 +1358,45 @@ class ApiController < ApplicationController
                          exists?
       
       logger.info("duplication_flag:#{duplication_flag}")
-                      
-      respond_to do |format|
-        if @ca_reward.save       
-          format.html { render :text => "OK" }
-        else
-          format.html { render :text => "NG" }
-        end
-      end
+      
+      #重複がなかった場合以下の処理を行う
+      if duplication_flag == false then
+        begin
+          #トランザクション開始
+          List.transaction do
+          
+            @ca_reward = CaReward.new
+            @ca_reward.list_id = params[:uid]
+            @ca_reward.cid = params[:cid]
+            @ca_reward.cname = params[:cname]
+            @ca_reward.carrier = params[:carrier]
+            @ca_reward.click_date = params[:click_date]
+            @ca_reward.action_date = params[:action_date]
+            @ca_reward.commission = params[:commission]
+            @ca_reward.aff_id = params[:aff_id]
+            @ca_reward.point = params[:point]
+            @ca_reward.pid = params[:pid]
+            @ca_reward.save!
+            
+            @user = List.find(params[:uid])
+            logger.info("Userのポイント:#{@user.point}")        
+            @user.update_attributes!(:point => @user.point + params[:point].to_i)
+          end
+            
+          respond_to do |format|
+              logger.info("OK")
+              format.html { render :text => "OK" }
+          end
+  
+        rescue => e
+          respond_to do |format|
+            logger.info("NG")
+            format.html { render :text => "NG" }
+          end
+        end  
     else
       respond_to do |format|
-        #format.html { render :text => "NG"}
+        logger.info("DUPLICATION")
         format.json { render :json => {:body => "NG"}}
       end
     end

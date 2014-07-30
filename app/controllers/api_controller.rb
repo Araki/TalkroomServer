@@ -1382,22 +1382,22 @@ class ApiController < ApplicationController
             logger.info("Userのポイント:#{@user.point}")        
             @user.update_attributes!(:point => @user.point + params[:point].to_i)
           end
-            
+          #トランザクション終了
           respond_to do |format|
-              logger.info("OK")
-              format.html { render :text => "OK" }
+            logger.info("OK")
+            format.html { render :text => "OK" }
           end
-  
         rescue => e
           respond_to do |format|
             logger.info("NG")
             format.html { render :text => "NG" }
           end
         end  
-    else
-      respond_to do |format|
-        logger.info("DUPLICATION")
-        format.json { render :json => {:body => "NG"}}
+      else
+        respond_to do |format|
+          logger.info("DUPLICATION")
+          format.json { render :json => {:body => "NG"}}
+        end
       end
     end
   end

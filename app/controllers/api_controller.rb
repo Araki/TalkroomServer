@@ -1363,7 +1363,8 @@ class ApiController < ApplicationController
       
       duplication_flag = CaReward.
                          where('cid = ? AND list_id = ? AND action_date = ? AND pid = ?', 
-                         params[:cid].to_i, params[:uid].to_i, params[:action_date].to_i, params[:pid].to_i).
+                         #params[:cid].to_i, params[:uid].to_i, params[:action_date], params[:pid].to_i).
+                         params[:cid].to_i, params[:uid].to_i, params[:pid].to_i).
                          exists?
       
       logger.info("duplication_flag:#{duplication_flag}")

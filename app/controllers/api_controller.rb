@@ -169,7 +169,7 @@ class ApiController < ApplicationController
     lists = Arel::Table.new(:lists, :as => 'rooms')
     rooms = Arel::Table.new(:rooms, :as => 'rooms')
     
-    access_user = List.find(@user.id, :select => "gender")
+    #access_user = List.find(@user.id, :select => "gender")
     logger.info("GENDER: #{access_user.gender}")
         
     query = lists.
@@ -193,6 +193,7 @@ class ApiController < ApplicationController
     if params[:purpose] != "" then
       query = query.where(lists[:purpose].eq(params[:purpose]))
     end
+=begin
     if access_user.gender == "male" then
       query = query.where(lists[:gender].not_eq(access_user.gender))
       #logger.info("##########MALE")
@@ -200,7 +201,7 @@ class ApiController < ApplicationController
       query = query.where(lists[:gender].not_eq(access_user.gender))
       #logger.info("##########FEMALE")
     end
-            
+=end      
     sql = query.to_sql
     logger.info("============================")
     logger.info(sql)    

@@ -182,6 +182,7 @@ class ApiController < ApplicationController
                     lists[:purpose],
                     lists[:last_logined]
             ).
+            where(lists[:id].not_eq(@user.id)).
             order(lists[:last_logined].desc)
             
     if params[:age] != "" then

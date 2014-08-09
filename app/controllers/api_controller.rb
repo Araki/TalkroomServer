@@ -110,9 +110,11 @@ class ApiController < ApplicationController
                   rooms[:public],
                   rooms[:updated_at],
                   male_lists[:id].as('sendfrom_id'),
+                  male_lists[:nickname].as('sendfrom_nickname'),
                   male_lists[:profile_image1].as('sendfrom_image'),
                   male_messages[:body].as('sendfrom_message'),
                   female_lists[:id].as('sendto_id'),
+                  female_lists[:nickname].as('sendto_nickname'),
                   female_lists[:profile_image1].as('sendto_image'),
                   female_messages[:body].as('sendto_message')
                   ).
@@ -137,9 +139,11 @@ class ApiController < ApplicationController
         :public => result["public"],
         :updated_at => updatedtime,
         :sendfrom_id => result["sendfrom_id"],
+        :sendfrom_nickname => result["sendfrom_nickname"],
         :sendfrom_image => result["sendfrom_image"],
         :sendfrom_message => result["sendfrom_message"], 
         :sendto_id => result["sendto_id"],
+        :sendto_nickname => result["sendto_nickname"],
         :sendto_image => result["sendto_image"],
         :sendto_message => result["sendto_message"]
       })

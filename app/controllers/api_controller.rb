@@ -170,7 +170,7 @@ class ApiController < ApplicationController
     rooms = Arel::Table.new(:rooms, :as => 'rooms')
     
     #access_user = List.find(@user.id, :select => "gender")
-    logger.info("GENDER: #{access_user.gender}")
+    #logger.info("GENDER: #{access_user.gender}")
         
     query = lists.
             project(lists[:id],

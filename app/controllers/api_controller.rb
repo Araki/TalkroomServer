@@ -182,7 +182,7 @@ class ApiController < ApplicationController
                     lists[:purpose],
                     lists[:last_logined]
             ).
-            where(lists[:id].not_eq(@user.id)).
+            where(lists[:id].not_eq(@user.id)).#検索したユーザーが出てこないように
             order(lists[:last_logined].desc)
             
     if params[:age] != "" then
@@ -653,7 +653,7 @@ class ApiController < ApplicationController
       })
     end
     
-    logger.info("ROOM_ID:#{val[0][:room_id]}")
+    #logger.info("ROOM_ID:#{val[0][:room_id]}")
     
     @room = Room.find(val[0][:room_id])
     vals = {
@@ -829,7 +829,7 @@ class ApiController < ApplicationController
     logger.info(sql)
     
     result = ActiveRecord::Base.connection.select(sql)
-    sender = List.find(@user.id, :select => "gender")
+    #sender = List.find(@user.id)
 
 
     if result.count < 1 then
@@ -838,7 +838,7 @@ class ApiController < ApplicationController
       @room = Room.new
       @room.public = TRUE
       @room.message_number = 0
-      if sender.gender == "male" then
+      if @user.gender == "male" then
         @room.male_id = @user.id
         @room.female_id = params[:sendto_list_id]
       else
@@ -883,19 +883,19 @@ class ApiController < ApplicationController
     respond_to do |format|
       if @message.save
         if result.count < 1 then
-          if sender.gender == "male" then
+          if @user.gender == "male" then
             logger.info("MESSAGE ID: #{@message.id}")
             @room.update_attributes(:male_last_message => @message.id, :updated_at => Time.now.utc, :message_number => @room.message_number + 1)
-          elsif sender.gender == "female" then
+          elsif @user.gender == "female" then
             logger.info("MESSAGE ID: #{@message.id}")
             @room.update_attributes(:female_last_message => @message.id, :updated_at => Time.now.utc, :message_number => @room.message_number + 1)
           end
         else
           room = Room.find(result[0]["room_id"])
-          if sender.gender == "male" then
+          if room.male_id == @user.id then#sender.gender == "male" then
             logger.info("MESSAGE ID: #{@message.id}")
             room.update_attributes(:male_last_message => @message.id, :updated_at => Time.now.utc, :message_number => room.message_number + 1)
-          elsif sender.gender == "female" then
+          elsif room.female_id == @user.id then#sender.gender == "female" then
             logger.info("MESSAGE ID: #{@message.id}")
             room.update_attributes(:female_last_message => @message.id, :updated_at => Time.now.utc, :message_number => room.message_number + 1)
           end

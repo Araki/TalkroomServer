@@ -1,0 +1,33 @@
+<%= form_for(@point_consumption) do |f| %>
+  <% if @point_consumption.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@point_consumption.errors.count, "error") %> prohibited this point_consumption from being saved:</h2>
+
+      <ul>
+      <% @point_consumption.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :list_id %><br />
+    <%= f.number_field :list_id %>
+  </div>
+  <div class="field">
+    <%= f.label :item_type %><br />
+    <%= f.text_field :item_type %>
+  </div>
+  <div class="field">
+    <%= f.label :point_consumption %><br />
+    <%= f.number_field :point_consumption %>
+  </div>
+  <div class="field">
+    <%= f.label :room_id %><br />
+    <%= f.number_field :room_id %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

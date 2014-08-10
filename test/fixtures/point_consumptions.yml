@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  list_id: 1
+  item_type: MyString
+  point_consumption: 1
+  room_id: 1
+
+two:
+  list_id: 1
+  item_type: MyString
+  point_consumption: 1
+  room_id: 1

@@ -1,6 +1,8 @@
 Talkroom::Application.routes.draw do
 
 
+  resources :point_consumptions
+
   resources :inquiries
 
   resources :buying_histories

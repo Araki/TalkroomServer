@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>List:</b>
+  <%= @point_consumption.list_id %>
+</p>
+
+<p>
+  <b>Item type:</b>
+  <%= @point_consumption.item_type %>
+</p>
+
+<p>
+  <b>Point consumption:</b>
+  <%= @point_consumption.point_consumption %>
+</p>
+
+<p>
+  <b>Room:</b>
+  <%= @point_consumption.room_id %>
+</p>
+
+
+<%= link_to 'Edit', edit_point_consumption_path(@point_consumption) %> |
+<%= link_to 'Back', point_consumptions_path %>

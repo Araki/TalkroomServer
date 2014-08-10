@@ -1,0 +1,29 @@
+<h1>Listing point_consumptions</h1>
+
+<table>
+  <tr>
+    <th>List</th>
+    <th>Item type</th>
+    <th>Point consumption</th>
+    <th>Room</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @point_consumptions.each do |point_consumption| %>
+  <tr>
+    <td><%= point_consumption.list_id %></td>
+    <td><%= point_consumption.item_type %></td>
+    <td><%= point_consumption.point_consumption %></td>
+    <td><%= point_consumption.room_id %></td>
+    <td><%= link_to 'Show', point_consumption %></td>
+    <td><%= link_to 'Edit', edit_point_consumption_path(point_consumption) %></td>
+    <td><%= link_to 'Destroy', point_consumption, :method => :delete, :data => { :confirm => 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Point consumption', new_point_consumption_path %>

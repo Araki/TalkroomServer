@@ -702,7 +702,15 @@ class ApiController < ApplicationController
   def consume_point
     before_point = @user.point
     after_point = before_point - params[:consume_point].to_i
-     
+    
+    @point = PointConsumption.new({
+          :list_id => @user.id,
+          :item_type => params[:item_type],
+          :point_consumption => params[:consume_point],
+          :room_id => params[:room_id],
+    })
+    @point.save
+    
     respond_to do |format|
       if @user.update_attribute(:point, after_point)
         format.json { render :json => @user.point, :status => 200 }

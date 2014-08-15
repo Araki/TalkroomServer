@@ -959,15 +959,31 @@ class ApiController < ApplicationController
       :secret_access_key => '2X1C5M/c2OAt77xVFvKE/5XmYH3BUFpeOY5ENk09', 
       :region => 'us-east-1'
     )
+    
     s3 = AWS::S3.new #S3オブジェクトの生成
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
     
+    #以前の画像の削除
+    @user = List.find(@user.id)
+    
+    case params[:which_image]
+      when "profile_image1" then
+        previous_image = @user.profile_image1
+      when "profile_image2" then
+        previous_image = @user.profile_image2
+      when "profile_image3" then
+        previous_image = @user.profile_image3
+    end
+    
+    o = bucket.objects[previous_image]
+    o.delete()
+    
+    #アップロードされた画像を登録
     file = params[:media]
     strAry = file.original_filename.split(".")
     file_type = "." + strAry[1]
-    file_name = format("%09d", @user.id).to_s + "-" + params[:which_image] + file_type
+    file_name = format("%09d", @user.id).to_s + "-" + params[:which_image] + "-" + Time.now.strftime("%y%m%d%H%M%S") + file_type
     file_full_path = "images/" + file_name
-    logger.info("#########TIME:#{Time.now.strftime("%y%m%d%H%M%S")}")
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     object.write(resize_image(file.tempfile.path), {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納

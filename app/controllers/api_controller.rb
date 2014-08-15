@@ -979,7 +979,8 @@ class ApiController < ApplicationController
     logger.info("image_url_ary.length:#{image_url_ary.length}")
     logger.info("deleteimage:#{previous_image}")
     o = bucket.objects[previous_image]
-    o.delete()
+    #o.delete()
+    s3.delete previous_image, 'talkroom-profile'
     
     #アップロードされた画像を登録
     file = params[:media]

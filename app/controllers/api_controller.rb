@@ -967,7 +967,7 @@ class ApiController < ApplicationController
     file_type = "." + strAry[1]
     file_name = format("%09d", @user.id).to_s + "-" + params[:which_image] + file_type
     file_full_path = "images/" + file_name
-    
+    logger.info("#########TIME:#{Time.now.strftime("%y%m%d%H%M%S")}")
     object = bucket.objects[file_full_path] #objectというオブジェクトの作成
     object.write(resize_image(file.tempfile.path), {:acl => :public_read}) #作成したobjectをs3にファイルを保存
     #画像ファイルパスの格納

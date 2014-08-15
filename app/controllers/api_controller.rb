@@ -975,7 +975,7 @@ class ApiController < ApplicationController
         image_url = @user.profile_image3
     end
     image_url_ary = image_url.split("/")
-    previous_image = "/images/" + image_url_ary[image_url_ary.length - 1]
+    previous_image = "images/" + image_url_ary[image_url_ary.length - 1]
     logger.info("image_url_ary.length:#{image_url_ary.length}")
     logger.info("deleteimage:#{previous_image}")
     o = bucket.objects[previous_image]

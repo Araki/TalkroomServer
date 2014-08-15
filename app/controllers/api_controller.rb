@@ -186,6 +186,7 @@ class ApiController < ApplicationController
             project(lists[:id],
                     lists[:nickname],
                     lists[:age],
+                    lists[:gender],
                     lists[:profile_image1],
                     lists[:profile],
                     lists[:area],
@@ -201,10 +202,14 @@ class ApiController < ApplicationController
     if params[:area] != "" then
       query = query.where(lists[:area].eq(params[:area]))
     end
+    if params[:gender] != "" then
+      query = query.where(lists[:gender].eq(params[:gender]))
+    end
+=begin
     if params[:purpose] != "" then
       query = query.where(lists[:purpose].eq(params[:purpose]))
     end
-=begin
+=
     if access_user.gender == "male" then
       query = query.where(lists[:gender].not_eq(access_user.gender))
       #logger.info("##########MALE")
@@ -232,7 +237,8 @@ class ApiController < ApplicationController
         :profile_image1 => result["profile_image1"],
         :profile => result["profile"],
         :area => result["area"],
-        :purpose => result["purpose"],
+        :gender => result["gender"],
+        #:purpose => result["purpose"],
         :last_logined => logintime
         #:room_id => result["room_id"]
       })

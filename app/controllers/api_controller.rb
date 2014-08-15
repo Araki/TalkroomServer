@@ -968,13 +968,16 @@ class ApiController < ApplicationController
     
     case params[:which_image]
       when "profile_image1" then
-        previous_image = @user.profile_image1
+        image_url = @user.profile_image1
       when "profile_image2" then
-        previous_image = @user.profile_image2
+        image_url = @user.profile_image2
       when "profile_image3" then
-        previous_image = @user.profile_image3
+        image_url = @user.profile_image3
     end
-    
+    image_url_ary = image_url.split("/")
+    previous_image = image_url_ary[image_url_ary.length - 1]
+    logger.info("image_url_ary.length:#{image_url_ary.length}")
+    logger.info("deleteimage:#{previous_image}")
     o = bucket.objects[previous_image]
     o.delete()
     

@@ -996,21 +996,21 @@ class ApiController < ApplicationController
       case params[:which_image]
       when "profile_image1"
         if @user.update_attributes(:profile_image1 => file_url)
-          format.json { render :json => "success", :status => 200 }
+          format.json { render :json => {:success => "success", :image => file_url, :status => 200 } }
         else
-          format.json { render :json => @user.errors, :status => :unprocessable_entity }
+          format.json { render :json => { :success => @user.errors, :status => :unprocessable_entity } }
         end
       when "profile_image2"
         if @user.update_attributes(:profile_image2 => file_url)
-          format.json { render :json => "success", :status => 200 }
+          format.json { render :json => {:success => "success", :image => file_url, :status => 200 } }
         else
-          format.json { render :json => @user.errors, :status => :unprocessable_entity }
+          format.json { render :json => {:success => @user.errors, :status => :unprocessable_entity } }
         end
       when "profile_image3"
         if @user.update_attributes(:profile_image3 => file_url)
-          format.json { render :json => "success", :status => 200 }
+          format.json { render :json => {:success => "success", :image => file_url, :status => 200 } }
         else
-          format.json { render :json => @user.errors, :status => :unprocessable_entity }
+          format.json { render :json => {:success => @user.errors, :status => :unprocessable_entity } }
         end
       end
     end

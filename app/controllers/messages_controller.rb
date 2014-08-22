@@ -45,18 +45,18 @@ class MessagesController < ApplicationController
   # POST /messages.json
   def create
 
-    logger.info("Message===========")
-    logger.info(params[:body])
-    logger.info(params[:sendto_list_id])
-    logger.info(params[:sendfrom_list_id])
-    logger.info(params[:room_id])
-    logger.info("sendfrom_list_id===========")
+    #logger.info("Message===========")
+    #logger.info(params[:body])
+    #logger.info(params[:sendto_list_id])
+    #logger.info(params[:sendfrom_list_id])
+    #logger.info(params[:room_id])
+    #logger.info("sendfrom_list_id===========")
     
-    @message = Message.new
-    @message.sendfrom_list_id = params[:sendfrom_list_id]
-    @message.sendto_list_id = params[:sendto_list_id]
-    @message.room_id = params[:room_id]
-    @message.body = params[:body]
+    @message = Message.new(params[:message])
+    #@message.sendfrom_list_id = params[:sendfrom_list_id]
+    #@message.sendto_list_id = params[:sendto_list_id]
+    #@message.room_id = params[:room_id]
+    #@message.body = params[:body]
 
     respond_to do |format|
       if @message.save

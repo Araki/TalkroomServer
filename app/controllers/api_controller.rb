@@ -963,18 +963,17 @@ class ApiController < ApplicationController
     s3 = AWS::S3.new #S3オブジェクトの生成
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
     
-    #以前の画像の削除
-    if List.where(:id => @user.id).exists? then
-      @user = List.find(@user.id)
-      
-      case params[:which_image]
-        when "profile_image1" then
-          image_url = @user.profile_image1
-        when "profile_image2" then
-          image_url = @user.profile_image2
-        when "profile_image3" then
-          image_url = @user.profile_image3
-      end
+    #以前の画像の削除      
+    case params[:which_image]
+      when "profile_image1" then
+        image_url = @user.profile_image1
+      when "profile_image2" then
+        image_url = @user.profile_image2
+      when "profile_image3" then
+        image_url = @user.profile_image3
+    end
+    
+    unless image_url == "" || image_url == nil then
       image_url_ary = image_url.split("/")
       previous_image = "images/" + image_url_ary[image_url_ary.length - 1]
       logger.info("image_url_ary.length:#{image_url_ary.length}")

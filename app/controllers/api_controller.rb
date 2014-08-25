@@ -964,7 +964,7 @@ class ApiController < ApplicationController
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
     
     #以前の画像の削除
-    if List.find(@user.id).exists? then
+    if List.where(:id => @user.id).exists? then
       @user = List.find(@user.id)
       
       case params[:which_image]

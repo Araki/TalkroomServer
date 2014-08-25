@@ -964,22 +964,24 @@ class ApiController < ApplicationController
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
     
     #以前の画像の削除
-    @user = List.find(@user.id)
-    
-    case params[:which_image]
-      when "profile_image1" then
-        image_url = @user.profile_image1
-      when "profile_image2" then
-        image_url = @user.profile_image2
-      when "profile_image3" then
-        image_url = @user.profile_image3
+    if List.find(@user.id).exists? then
+      @user = List.find(@user.id)
+      
+      case params[:which_image]
+        when "profile_image1" then
+          image_url = @user.profile_image1
+        when "profile_image2" then
+          image_url = @user.profile_image2
+        when "profile_image3" then
+          image_url = @user.profile_image3
+      end
+      image_url_ary = image_url.split("/")
+      previous_image = "images/" + image_url_ary[image_url_ary.length - 1]
+      logger.info("image_url_ary.length:#{image_url_ary.length}")
+      logger.info("deleteimage:#{previous_image}")
+      o = bucket.objects[previous_image]
+      o.delete()
     end
-    image_url_ary = image_url.split("/")
-    previous_image = "images/" + image_url_ary[image_url_ary.length - 1]
-    logger.info("image_url_ary.length:#{image_url_ary.length}")
-    logger.info("deleteimage:#{previous_image}")
-    o = bucket.objects[previous_image]
-    o.delete()
     
     #アップロードされた画像を登録
     file = params[:media]

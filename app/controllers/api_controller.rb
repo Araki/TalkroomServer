@@ -1201,7 +1201,7 @@ class ApiController < ApplicationController
   # すでに登録されているときは、認証用のapp_tokenを返却
   #================================================================
   def check_login
-    reward_flag = true;
+    reward_flag = false;
     logger.info(params[:fb_uid])
     logger.info(params[:access_token])
     

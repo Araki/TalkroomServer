@@ -1268,12 +1268,16 @@ class ApiController < ApplicationController
         history.save!
         
         case receipt_detail[:product_id]
-        when "jp.shiftage.talkroom.testpoint100" then
+        when "jp.shiftage.talkroom.100point" then
           point = 100
-        when "jp.shiftage.talkroom.testpoint300" then
-          point = 300
-        when "jp.shiftage.talkroom.testpoint500" then
-          point = 500
+        when "jp.shiftage.talkroom.600point" then
+          point = 600
+        when "jp.shiftage.talkroom.1200point" then
+          point = 1200
+        when "jp.shiftage.talkroom.3000point" then
+          point = 3000
+        when "jp.shiftage.talkroom.6000point" then
+          point = 6000
         end
         @list = List.find(@user.id)
         @list.update_attribute(:point, @list.point + point)

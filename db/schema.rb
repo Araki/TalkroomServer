@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140729132030) do
+ActiveRecord::Schema.define(:version => 20140902140624) do
 
   create_table "buying_histories", :force => true do |t|
     t.integer  "list_id"
@@ -25,8 +25,8 @@ ActiveRecord::Schema.define(:version => 20140729132030) do
     t.integer  "cid"
     t.string   "cname"
     t.integer  "carrier"
-    t.integer  "click_date"
-    t.integer  "action_date"
+    t.string   "click_date"
+    t.string   "action_date"
     t.integer  "commission"
     t.string   "aff_id"
     t.integer  "point"
@@ -68,8 +68,8 @@ ActiveRecord::Schema.define(:version => 20140729132030) do
   add_index "ios_transactions", ["transaction_id"], :name => "index_ios_transactions_on_transaction_id", :unique => true
 
   create_table "lists", :force => true do |t|
-    t.datetime "created_at",                                     :null => false
-    t.datetime "updated_at",                                     :null => false
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
     t.string   "channel"
     t.string   "fb_uid"
     t.string   "nickname"
@@ -91,13 +91,6 @@ ActiveRecord::Schema.define(:version => 20140729132030) do
     t.integer  "point"
     t.datetime "last_logined"
     t.string   "gender"
-    t.integer  "sign_in_count",                   :default => 0
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.integer  "uid",                :limit => 8
-    t.string   "password"
     t.string   "app_token"
   end
 
@@ -108,6 +101,15 @@ ActiveRecord::Schema.define(:version => 20140729132030) do
     t.string   "body"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
+  end
+
+  create_table "point_consumptions", :force => true do |t|
+    t.integer  "list_id"
+    t.string   "item_type"
+    t.integer  "point_consumption"
+    t.integer  "room_id"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
   end
 
   create_table "rooms", :force => true do |t|

@@ -1150,7 +1150,7 @@ class ApiController < ApplicationController
       @list.area = params[:area]
       @list.profile_image1 = params[:profile_image1]
       @list.profile = params[:profile]
-      @list.point = params[:point]
+      @list.point = 100#params[:point]
       @list.last_logined = Time.now.utc
     
       # セキュリティ向上のためのトークンを生成

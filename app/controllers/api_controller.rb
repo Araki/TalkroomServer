@@ -1526,7 +1526,7 @@ class ApiController < ApplicationController
 =end
     respond_to do |format|
       #if @inquiry.save       
-        mail = InquiryMailer.send_report(@inquiry.id,
+        mail = InquiryMailer.send_report(@user.id,
                                          params[:reported_id],
                                          params[:platform], 
                                          params[:version], 

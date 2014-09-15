@@ -18,6 +18,7 @@ class ApiController < ApplicationController
                                             :create_message,
                                             :get_visits,
                                             :send_mail,
+                                            :send_report,
                                             :verify_receipt,
                                             :get_point,
                                             :consume_point,
@@ -1490,6 +1491,48 @@ class ApiController < ApplicationController
                                               params[:model],
                                               params[:mail], 
                                               params[:body]).deliver
+        format.json{ render :text => "OK" }
+      else
+        format.json { render :json => @list.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+  
+  def send_report
+    # SSL/TLSを有効に
+    require 'tlsmail'
+    Net::SMTP.enable_tls(OpenSSL::SSL::VERIFY_NONE)
+    
+    ActionMailer::Base.delivery_method = :smtp
+    ActionMailer::Base.raise_delivery_errors = true
+    ActionMailer::Base.perform_deliveries = true
+    ActionMailer::Base.smtp_settings = {
+      :address => 'smtp.gmail.com',
+      :port => 587,
+      :domain => 'mail.gmail.com',
+      :authentication => :plain,
+      :user_name => 'araki@shiftage.jp',
+      :password => 'bradpitt'
+    }
+=begin    
+    @inquiry = Inquiry.new
+    @inquiry.list_id = @user.id
+    @inquiry.platform = params[:platform]
+    @inquiry.version = params[:version]
+    @inquiry.manufacturer = params[:manufacturer]
+    @inquiry.model = params[:model]
+    @inquiry.address = params[:mail]
+    @inquiry.body = params[:body]
+=end
+    respond_to do |format|
+      if @inquiry.save       
+        mail = InquiryMailer.send_report(@inquiry.id,
+                                         params[:reported_id],
+                                         params[:platform], 
+                                         params[:version], 
+                                         params[:manufacturer],
+                                         params[:model],
+                                         params[:body]).deliver
         format.json{ render :text => "OK" }
       else
         format.json { render :json => @list.errors, :status => :unprocessable_entity }

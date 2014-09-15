@@ -41,6 +41,7 @@ Talkroom::Application.routes.draw do
   match "/check_login" => "api#check_login"
   match "/car_pointback" => "api#car_pointback"
   match "/send_mail" => "api#send_mail"
+  match "/send_report" => "api#send_report"
   
   match "/verify_receipt" => "api#verify_receipt", :defaults => {:format => :json}
   

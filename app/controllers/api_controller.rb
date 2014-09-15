@@ -1525,7 +1525,7 @@ class ApiController < ApplicationController
     @inquiry.body = params[:body]
 =end
     respond_to do |format|
-      if @inquiry.save       
+      #if @inquiry.save       
         mail = InquiryMailer.send_report(@inquiry.id,
                                          params[:reported_id],
                                          params[:platform], 
@@ -1534,9 +1534,9 @@ class ApiController < ApplicationController
                                          params[:model],
                                          params[:body]).deliver
         format.json{ render :text => "OK" }
-      else
-        format.json { render :json => @list.errors, :status => :unprocessable_entity }
-      end
+      #else
+        #format.json { render :json => @list.errors, :status => :unprocessable_entity }
+      #end
     end
   end
   

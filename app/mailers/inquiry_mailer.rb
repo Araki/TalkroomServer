@@ -37,4 +37,6 @@ class InquiryMailer < ActionMailer::Base
     #end
     mail(:to => "araki@shiftage.jp", :subject => subject)
   end
+  
+  
 end

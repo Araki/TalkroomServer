@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140902140624) do
+ActiveRecord::Schema.define(:version => 20140917044128) do
 
   create_table "buying_histories", :force => true do |t|
     t.integer  "list_id"
@@ -92,6 +92,9 @@ ActiveRecord::Schema.define(:version => 20140902140624) do
     t.datetime "last_logined"
     t.string   "gender"
     t.string   "app_token"
+    t.string   "uuid"
+    t.string   "idfv"
+    t.string   "idfa"
   end
 
   create_table "messages", :force => true do |t|

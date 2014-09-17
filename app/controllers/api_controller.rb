@@ -954,7 +954,7 @@ class ApiController < ApplicationController
   #画像をアップロード
   #================================================================
   
-  def upload_image
+  def upload_image image=nil
     AWS.config(
       :access_key_id => 'AKIAIF2RBQ4WNU3KWKMQ', 
       :secret_access_key => '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', 
@@ -964,7 +964,7 @@ class ApiController < ApplicationController
     s3 = AWS::S3.new #S3オブジェクトの生成
     bucket = s3.buckets['talkroom-profile'] #bucketの指定
     
-    #以前の画像の削除      
+    #以前の画像の削除
     case params[:which_image]
       when "profile_image1" then
         image_url = @user.profile_image1
@@ -984,7 +984,11 @@ class ApiController < ApplicationController
     end
     
     #アップロードされた画像を登録
-    file = params[:media]
+    if image != nil then
+      file = 
+    elsif
+      file = params[:media]
+    end
     strAry = file.original_filename.split(".")
     file_type = "." + strAry[1]
     file_name = format("%09d", @user.id).to_s + "-" + params[:which_image] + "-" + Time.now.strftime("%y%m%d%H%M%S") + file_type
@@ -1119,50 +1123,56 @@ class ApiController < ApplicationController
   #================================================================
   def create_account
     
+    if params[:channel] == "facebook"
+      accesstoken_id = params[:fb_uid]
+    elsif prams[:channel] == "normal"
+      accesstoken_id = params[:uuid]
+    end
+    
     # access_token チェック
-    if Digest::MD5.hexdigest(Digest::MD5.hexdigest(params[:fb_uid])) != params[:access_token] 
+    if Digest::MD5.hexdigest(Digest::MD5.hexdigest(accesstoken_id)) != params[:access_token] 
       # 異なるときはエラー
       respond_to do |format|
         format.json { render :json => {:error => "Invalid Access Token", :status => 403 }}
       end
     else
       
-      logger.info("===========Create Account===========")
-      logger.info(params[:channel])
-      logger.info(params[:fb_uid])
-      logger.info(params[:nickname])
-      logger.info(params[:gender])
-      logger.info(params[:email])
-      logger.info(params[:age])
-      logger.info(params[:purpose])
-      logger.info(params[:area])
-      logger.info(params[:profile_image1])
-      logger.info(params[:profile])
-      logger.info(params[:point])
+      begin#トランザクション開始
+        List.transaction do
+          @list = List.new
+          @list.channel = params[:channel]
+          @list.uuid = params[:uuid]
+          @list.idfv = params[:idfv]
+          @list.idfa = params[:idfa]
+          @list.fb_uid = params[:fb_uid]
+          @list.nickname = params[:nickname]
+          @list.gender = params[:gender]
+          @list.email = params[:email]
+          @list.age = params[:age]
+          #@list.purpose = params[:purpose]
+          @list.area = params[:area]
+          @list.profile_image1 = params[:profile_image1]
+          @list.profile = params[:profile]
+          @list.point = 100#params[:point]
+          @list.last_logined = Time.now.utc
+          # セキュリティ向上のためのトークンを生成
+          # （ここで生成された値をスマートフォン側に保存しておく必要あり）
+          @list.app_token = accesstoken_id + "-" + Digest::MD5.hexdigest(accesstoken_id + Time.now.to_s)
+          @list.save!
+          
+          if params[:channel] == "facebook"
+            upload_fb_image(@list)
+          elsif prams[:channel] == "normal"
+            upload_image(@list)
+          end
+          
+        end#トランザクション終了
         
-      @list = List.new
-      @list.channel = params[:channel]
-      @list.fb_uid = params[:fb_uid]
-      @list.nickname = params[:nickname]
-      @list.gender = params[:gender]
-      @list.email = params[:email]
-      @list.age = params[:age]
-      @list.purpose = params[:purpose]
-      @list.area = params[:area]
-      @list.profile_image1 = params[:profile_image1]
-      @list.profile = params[:profile]
-      @list.point = 100#params[:point]
-      @list.last_logined = Time.now.utc
-    
-      # セキュリティ向上のためのトークンを生成
-      # （ここで生成された値をスマートフォン側に保存しておく必要あり）
-      @list.app_token = params[:fb_uid] + "-" + Digest::MD5.hexdigest(params[:fb_uid] + Time.now.to_s)
-    
-      respond_to do |format|
-        if @list.save
-          upload_fb_image(@list)
+        respond_to do |format|
           format.json { render :json => @list, :status => 200 }
-        else
+        end
+      rescue => e
+        respond_to do |format|
           format.json { render :json => @list.errors, :status => :unprocessable_entity }
         end
       end

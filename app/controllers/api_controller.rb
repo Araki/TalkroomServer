@@ -1151,7 +1151,7 @@ class ApiController < ApplicationController
           @list.age = params[:age]
           #@list.purpose = params[:purpose]
           @list.area = params[:area]
-          @list.profile_image1 = params[:profile_image1]
+          #@list.profile_image1 = params[:profile_image1]
           @list.profile = params[:profile]
           @list.point = 100#params[:point]
           @list.last_logined = Time.now.utc
